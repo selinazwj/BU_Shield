@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#CC0000">
-<title>BU Shield</title>
+<title>ICE Watch — BU Shield</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -678,8 +678,260 @@
     line-height: 1.4;
   }
 
-  /* BOTTOM NAV */
-  nav {
+  /* COMMUNITY CHAT */
+  .chat-board { display: flex; flex-direction: column; gap: 10px; }
+
+  .chat-msg {
+    background: white;
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--black);
+    line-height: 1.5;
+    border-left: 3px solid var(--red);
+    position: relative;
+  }
+
+  .chat-msg.scenario { border-left-color: #6366f1; background: #faf5ff; }
+  .chat-msg.scenario .chat-tag { background: #6366f1; }
+
+  .chat-tag {
+    display: inline-block;
+    background: var(--red);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .chat-author {
+    font-size: 11px;
+    color: var(--gray);
+    margin-top: 6px;
+    font-weight: 600;
+  }
+
+  .chat-input-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .chat-input {
+    flex: 1;
+    border: 1.5px solid #e5e7eb;
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .chat-input:focus { border-color: var(--red); }
+
+  .chat-send {
+    background: var(--red);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 10px 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  /* PSYCH RESOURCES */
+  .psych-card {
+    background: white;
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    border: 1.5px solid #e5e7eb;
+    cursor: pointer;
+    text-decoration: none;
+    transition: border-color 0.2s;
+  }
+
+  .psych-card:hover { border-color: var(--red); }
+
+  .psych-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .psych-info { flex: 1; }
+  .psych-name { font-size: 14px; font-weight: 700; color: var(--black); margin-bottom: 2px; }
+  .psych-desc { font-size: 12px; color: var(--gray); line-height: 1.4; }
+
+  /* UNIVERSITY LINKS */
+  .uni-card {
+    background: white;
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1.5px solid #e5e7eb;
+    text-decoration: none;
+    transition: border-color 0.2s;
+  }
+
+  .uni-card:hover { border-color: var(--red); }
+
+  .uni-left { display: flex; flex-direction: column; gap: 2px; }
+  .uni-name { font-size: 14px; font-weight: 700; color: var(--black); }
+  .uni-desc { font-size: 12px; color: var(--gray); }
+
+  .uni-arrow {
+    color: var(--gray);
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  /* HEART */
+  .heart-footer {
+    text-align: center;
+    padding: 8px 0 4px;
+    font-size: 12px;
+    color: var(--gray);
+    line-height: 1.8;
+  }
+
+  .heart-footer span { color: var(--red); }
+
+  /* PSYCH CARDS */
+  .psych-card {
+    background: var(--gray-light);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+  }
+
+  .psych-name { font-size: 13px; font-weight: 700; color: var(--black); margin-bottom: 2px; }
+  .psych-desc { font-size: 12px; color: var(--gray); margin-bottom: 6px; }
+  .psych-link { font-size: 12px; font-weight: 700; color: var(--red); text-decoration: none; }
+
+  /* COMMUNITY BOARD */
+  .community-board {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .community-msg {
+    background: var(--gray-light);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--black);
+    border-left: 3px solid var(--red);
+  }
+
+  .community-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 6px;
+  }
+
+  .community-author { font-size: 11px; color: var(--gray); font-weight: 600; }
+
+  .reply-btn {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--red);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .reply-thread {
+    display: none;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .reply-thread.open { display: block; }
+
+  .reply-item {
+    font-size: 12px;
+    color: #374151;
+    line-height: 1.5;
+    background: white;
+    border-radius: 8px;
+    padding: 8px 10px;
+  }
+
+  .post-box {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .post-input {
+    width: 100%;
+    border: 1.5px solid #e5e7eb;
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--black);
+    resize: none;
+    outline: none;
+  }
+
+  .post-input:focus { border-color: var(--red); }
+
+  .post-btn {
+    background: var(--black);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 11px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .post-btn:active { background: #333; }
+
+  /* UNI CARDS */
+  .uni-card {
+    background: var(--gray-light);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-decoration: none;
+    border: 1.5px solid transparent;
+    transition: border-color 0.2s;
+  }
+
+  .uni-card:hover { border-color: var(--red); }
+  .uni-left { display: flex; flex-direction: column; gap: 2px; }
+  .uni-name { font-size: 14px; font-weight: 700; color: var(--black); }
+  .uni-desc { font-size: 12px; color: var(--gray); }
+  .uni-arrow { color: var(--gray); font-size: 16px; flex-shrink: 0; }
     position: fixed;
     bottom: 0;
     width: 100%;
@@ -752,8 +1004,8 @@
 <div class="phone">
   <header>
     <div class="logo">
-      <span class="logo-bu">BU</span>
-      <span class="logo-shield">SHIELD</span>
+      <span class="logo-bu">ICE</span>
+      <span class="logo-shield">WATCH</span>
     </div>
     <div class="live-badge">
       <div class="live-dot"></div>
@@ -789,14 +1041,16 @@
     <section id="support-tab" class="tab-content">
       <div class="support-section">
 
+        <!-- EMERGENCY LINE -->
         <div class="emergency-card">
-          <div class="emergency-label">🚨 Emergency Legal Line</div>
+          <div class="emergency-label">Emergency Legal Line</div>
           <div class="emergency-title">BU Legal Rapid Response</div>
           <div class="emergency-number">(617) 353-XXXX</div>
           <div class="emergency-sub">Available 24/7 · Calls are confidential</div>
-          <a href="tel:+16173530000" class="call-btn">📞 Call Now</a>
+          <a href="tel:+16173530000" class="call-btn">Call Now</a>
         </div>
 
+        <!-- MENTAL HEALTH -->
         <div>
           <div class="section-title">Feeling anxious?</div>
           <div class="section-sub">You are in a safe space. Help is available now.</div>
@@ -805,29 +1059,146 @@
               💬 Start Anonymous Chat
             </button>
             <button class="resource-btn breathe" onclick="openBreathe()">
-              🧘 4-7-8 Breathing Exercise
+              4-7-8 Breathing Exercise
             </button>
           </div>
         </div>
 
+        <!-- PSYCHOLOGICAL RESOURCES -->
         <div>
-          <div class="section-title">Student Community</div>
-          <div class="section-sub">Anonymous messages from your peers</div>
-          <div class="community-card">
-            <div class="community-msg">
-              "Reports near GSU right now. Everyone stay in buildings and keep safe."
-              <div class="community-author">— Anon Terrier · 5 min ago</div>
+          <div class="section-title">Psychological Resources</div>
+          <div class="section-sub">Free and confidential support for BU students</div>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <div class="psych-card">
+              <div class="psych-name">BU Student Health Services</div>
+              <div class="psych-desc">Counseling & Psychological Services (CAPS) — free for BU students</div>
+              <a href="https://www.bu.edu/shs/behavioral-medicine/" target="_blank" class="psych-link">Visit →</a>
+            </div>
+            <div class="psych-card">
+              <div class="psych-name">Crisis Text Line</div>
+              <div class="psych-desc">Text HOME to 741741. Free, 24/7, confidential</div>
+              <a href="sms:741741" class="psych-link">Text Now →</a>
+            </div>
+            <div class="psych-card">
+              <div class="psych-name">Immigration Stress Support</div>
+              <div class="psych-desc">National Alliance on Mental Illness (NAMI) Helpline</div>
+              <a href="tel:18009506264" class="psych-link">1-800-950-6264 →</a>
+            </div>
+            <div class="psych-card">
+              <div class="psych-name">Therapy for Latinx</div>
+              <div class="psych-desc">Culturally responsive therapist directory</div>
+              <a href="https://www.therapyforlatinx.com" target="_blank" class="psych-link">Visit →</a>
             </div>
           </div>
         </div>
 
-        <div style="background:#f5f5f5; border-radius:16px; padding:16px 18px;">
-          <div class="section-title" style="margin-bottom:8px;">Other Resources</div>
-          <div style="display:flex; flex-direction:column; gap:8px; font-size:14px; color:#374151;">
-            <div>🏛️ <strong>ISSO Office</strong> — bu.edu/isso</div>
-            <div>⚖️ <strong>ACLU Massachusetts</strong> — (617) 482-3170</div>
-            <div>🆘 <strong>National Immigration Legal Hotline</strong> — 1-844-363-1423</div>
+        <!-- COMMUNITY CHAT BOARD -->
+        <div>
+          <div class="section-title">Community Board</div>
+          <div class="section-sub">Ask anonymously — "What do I do if…"</div>
+          <div class="community-board" id="communityBoard">
+            <div class="community-msg">
+              "What do I do if ICE comes to my dorm door?"
+              <div class="community-meta">
+                <span class="community-author">— Anon Terrier</span>
+                <button class="reply-btn" onclick="toggleReply(this)">Reply</button>
+              </div>
+              <div class="reply-thread">
+                <div class="reply-item">Do NOT open the door. Ask them to slide the warrant under the door. Call the BU legal line immediately. — Peer Advisor</div>
+              </div>
+            </div>
+            <div class="community-msg">
+              "If my SEVIS record gets terminated, what happens to my classes?"
+              <div class="community-meta">
+                <span class="community-author">— Anon Terrier</span>
+                <button class="reply-btn" onclick="toggleReply(this)">Reply</button>
+              </div>
+              <div class="reply-thread">
+                <div class="reply-item">Contact ISSO immediately at bu.edu/isso — they have lawyers on call and can advise on next steps. — ISSO Advisor</div>
+              </div>
+            </div>
           </div>
+          <div class="post-box">
+            <textarea class="post-input" id="postInput" placeholder="Ask anonymously: What do I do if…" rows="2"></textarea>
+            <button class="post-btn" onclick="postMessage()">Post Anonymously</button>
+          </div>
+        </div>
+
+        <!-- UNIVERSITY DATABASES -->
+        <div>
+          <div class="section-title">Other Universities</div>
+          <div class="section-sub">Resources and databases from peer institutions</div>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <a href="https://www.harvard.edu/immigration-resources" target="_blank" class="uni-card">
+              <div class="uni-left">
+                <div class="uni-name">Harvard University</div>
+                <div class="uni-desc">Immigration resources & legal support for students</div>
+              </div>
+              <div class="uni-arrow">→</div>
+            </a>
+            <a href="https://isso.tufts.edu" target="_blank" class="uni-card">
+              <div class="uni-left">
+                <div class="uni-name">Tufts University</div>
+                <div class="uni-desc">ISSO immigration guidance & student support</div>
+              </div>
+              <div class="uni-arrow">→</div>
+            </a>
+            <a href="https://safety.uchicago.edu/resources/uchicago-safe/" target="_blank" class="uni-card">
+              <div class="uni-left">
+                <div class="uni-name">University of Chicago</div>
+                <div class="uni-desc">UChicago Safe app — campus safety model</div>
+              </div>
+              <div class="uni-arrow">→</div>
+            </a>
+            <a href="https://www.mit.edu/immigration" target="_blank" class="uni-card">
+              <div class="uni-left">
+                <div class="uni-name">MIT</div>
+                <div class="uni-desc">Immigration resources for students & scholars</div>
+              </div>
+              <div class="uni-arrow">→</div>
+            </a>
+            <a href="https://undocu.berkeley.edu" target="_blank" class="uni-card">
+              <div class="uni-left">
+                <div class="uni-name">UC Berkeley</div>
+                <div class="uni-desc">Undocumented Student Program — national model</div>
+              </div>
+              <div class="uni-arrow">→</div>
+            </a>
+          </div>
+        </div>
+
+        <!-- OTHER RESOURCES -->
+        <div style="background:#f5f5f5; border-radius:16px; padding:16px 18px;">
+          <div class="section-title" style="margin-bottom:10px;">Legal Resources</div>
+          <div style="display:flex; flex-direction:column; gap:10px; font-size:14px; color:#374151;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <div style="font-weight:700;">ISSO Office</div>
+                <div style="font-size:12px; color:#6b7280;">bu.edu/isso</div>
+              </div>
+              <a href="https://bu.edu/isso" target="_blank" style="color:var(--red); font-weight:700; font-size:13px; text-decoration:none;">Visit →</a>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <div style="font-weight:700;">ACLU Massachusetts</div>
+                <div style="font-size:12px; color:#6b7280;">(617) 482-3170</div>
+              </div>
+              <a href="tel:6174823170" style="color:var(--red); font-weight:700; font-size:13px; text-decoration:none;">Call →</a>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <div style="font-weight:700;">National Immigration Hotline</div>
+                <div style="font-size:12px; color:#6b7280;">1-844-363-1423</div>
+              </div>
+              <a href="tel:18443631423" style="color:var(--red); font-weight:700; font-size:13px; text-decoration:none;">Call →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- HEART FOOTER -->
+        <div class="heart-footer">
+          Made with <span>♥</span> for the BU community.<br>
+          You are not alone.
         </div>
 
       </div>
@@ -976,6 +1347,33 @@
 <div class="toast" id="toast"></div>
 
 <script>
+  // Community board
+  function toggleReply(btn) {
+    const thread = btn.closest('.community-msg').querySelector('.reply-thread');
+    thread.classList.toggle('open');
+    btn.textContent = thread.classList.contains('open') ? 'Hide' : 'Reply';
+  }
+
+  function postMessage() {
+    const input = document.getElementById('postInput');
+    const text = input.value.trim();
+    if (!text) return;
+    const board = document.getElementById('communityBoard');
+    const msg = document.createElement('div');
+    msg.className = 'community-msg';
+    msg.innerHTML = `
+      "${text}"
+      <div class="community-meta">
+        <span class="community-author">— Anon Terrier · just now</span>
+        <button class="reply-btn" onclick="toggleReply(this)">Reply</button>
+      </div>
+      <div class="reply-thread"></div>
+    `;
+    board.appendChild(msg);
+    input.value = '';
+    showToast('✅ Posted anonymously');
+  }
+
   // Tab switching
   function showTab(tabId, btn) {
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
