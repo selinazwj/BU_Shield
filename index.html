@@ -192,6 +192,25 @@ nav { position:fixed; bottom:0; width:100%; max-width:430px; background:white; b
 .breathe-text { font-size:18px; color:white; font-weight:600; text-align:center; margin-bottom:8px; }
 .breathe-instruction { font-size:13px; color:rgba(255,255,255,.4); text-align:center; margin-bottom:36px; }
 .breathe-close { background:rgba(255,255,255,.1); color:white; border:none; padding:12px 32px; border-radius:20px; font-family:'DM Sans',sans-serif; font-size:14px; cursor:pointer; }
+/* TRAINING */
+.training-scenario-card { background:var(--gray-light); border-radius:var(--r); padding:16px 18px; cursor:pointer; border:1.5px solid transparent; transition:border-color .15s; }
+.training-scenario-card:active { border-color:var(--red); }
+.ts-badge { font-size:10px; font-weight:700; color:var(--red); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+.ts-title { font-size:14px; font-weight:700; color:var(--black); margin-bottom:3px; }
+.ts-desc { font-size:12px; color:var(--gray); line-height:1.4; margin-bottom:8px; }
+.ts-start { font-size:12px; font-weight:700; color:var(--red); }
+.scenario-progress { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+.scenario-bar { flex:1; height:4px; background:#e5e7eb; border-radius:2px; overflow:hidden; }
+.scenario-fill { height:100%; background:var(--red); border-radius:2px; transition:width .4s ease; }
+.scenario-step { font-size:11px; font-weight:700; color:var(--gray); white-space:nowrap; }
+.scenario-box { background:var(--black); color:white; border-radius:var(--r); padding:18px; font-size:14px; line-height:1.7; margin-bottom:14px; }
+.scenario-choice { background:var(--gray-light); border:1.5px solid var(--border); border-radius:var(--rs); padding:13px 15px; font-size:13px; color:var(--black); cursor:pointer; font-family:'DM Sans',sans-serif; text-align:left; width:100%; transition:border-color .15s; line-height:1.4; }
+.scenario-choice:active { border-color:var(--red); }
+.scenario-choice.correct { background:#f0fdf4; border-color:#22c55e; color:#15803d; }
+.scenario-choice.wrong { background:#fff0f0; border-color:var(--red); color:var(--red); }
+.scenario-feedback { background:var(--gray-light); border-radius:var(--rs); padding:13px 15px; font-size:13px; line-height:1.6; color:var(--black); border-left:3px solid var(--red); margin-top:4px; }
+.scenario-feedback.good { border-left-color:#22c55e; background:#f0fdf4; }
+
 .toast { display:none; position:fixed; top:80px; left:50%; transform:translateX(-50%); background:var(--black); color:white; padding:11px 20px; border-radius:20px; font-size:13px; font-weight:600; z-index:1200; white-space:nowrap; animation:toastAnim 2.5s ease forwards; max-width:90%; }
 @keyframes toastAnim { 0%{opacity:0;transform:translateX(-50%) translateY(-10px)} 15%{opacity:1;transform:translateX(-50%) translateY(0)} 75%{opacity:1} 100%{opacity:0} }
 </style>
@@ -256,6 +275,13 @@ nav { position:fixed; bottom:0; width:100%; max-width:430px; background:white; b
         <div class="menu-card" onclick="showSub('sub-psych')">
           <div class="menu-icon purple">🧠</div>
           <div class="menu-text"><div class="menu-title">Psychological Resources</div><div class="menu-sub">CAPS, crisis lines, therapist directory</div></div>
+          <span class="menu-arrow">›</span>
+        </div>
+
+        <div class="section-label">Training</div>
+        <div class="menu-card" onclick="showSub('sub-training')">
+          <div class="menu-icon blue">📋</div>
+          <div class="menu-text"><div class="menu-title">Know Your Rights Training</div><div class="menu-sub">Interactive scenarios · 5 min</div></div>
           <span class="menu-arrow">›</span>
         </div>
 
@@ -391,6 +417,59 @@ nav { position:fixed; bottom:0; width:100%; max-width:430px; background:white; b
             <textarea class="post-input" id="postInput" rows="2" placeholder="What do I do if…"></textarea>
             <button class="post-btn" onclick="postMessage()">Post Anonymously</button>
           </div>
+        </div>
+      </div>
+
+      <!-- SUB: TRAINING -->
+      <div class="support-sub" id="sub-training">
+        <div class="sub-header">
+          <button class="back-btn" onclick="showSupportHome()">‹</button>
+          <span class="sub-header-title">Know Your Rights Training</span>
+        </div>
+        <div class="sub-content">
+
+          <div id="training-home">
+            <p style="font-size:13px;color:var(--gray);line-height:1.6;">Practice what to do in real situations. Each scenario takes about 1 minute. No wrong answers — just learn.</p>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px;">
+              <div class="training-scenario-card" onclick="startScenario(0)">
+                <div class="ts-badge">Scenario 1</div>
+                <div class="ts-title">ICE at your dorm door</div>
+                <div class="ts-desc">What do you do when there's a knock and agents identify themselves?</div>
+                <div class="ts-start">Start →</div>
+              </div>
+              <div class="training-scenario-card" onclick="startScenario(1)">
+                <div class="ts-badge">Scenario 2</div>
+                <div class="ts-title">Stopped on the street</div>
+                <div class="ts-desc">An agent approaches you near campus and asks for your ID.</div>
+                <div class="ts-start">Start →</div>
+              </div>
+              <div class="training-scenario-card" onclick="startScenario(2)">
+                <div class="ts-badge">Scenario 3</div>
+                <div class="ts-title">Your friend is detained</div>
+                <div class="ts-desc">You witness a classmate being taken by plainclothes officers.</div>
+                <div class="ts-start">Start →</div>
+              </div>
+              <div class="training-scenario-card" onclick="startScenario(3)">
+                <div class="ts-badge">Scenario 4</div>
+                <div class="ts-title">Warrant verification</div>
+                <div class="ts-desc">An officer shows you a document. Is it a real judicial warrant?</div>
+                <div class="ts-start">Start →</div>
+              </div>
+            </div>
+          </div>
+
+          <div id="training-scenario" style="display:none;">
+            <div class="scenario-progress">
+              <div class="scenario-bar"><div class="scenario-fill" id="scenarioFill"></div></div>
+              <div class="scenario-step" id="scenarioStep">Step 1 of 3</div>
+            </div>
+            <div class="scenario-box" id="scenarioBox"></div>
+            <div id="scenarioChoices" style="display:flex;flex-direction:column;gap:8px;"></div>
+            <div id="scenarioFeedback" style="display:none;" class="scenario-feedback"></div>
+            <button id="scenarioNext" style="display:none;" class="post-btn" onclick="nextStep()">Continue →</button>
+            <button id="scenarioRestart" style="display:none;background:none;border:none;color:var(--red);font-family:\'DM Sans\',sans-serif;font-size:13px;font-weight:700;cursor:pointer;padding:8px 0;" onclick="backToTrainingHome()">← Try another scenario</button>
+          </div>
+
         </div>
       </div>
 
@@ -630,7 +709,179 @@ function postMessage() {
   board.appendChild(msg); input.value=''; showToast('✅ Posted anonymously');
 }
 
-function showToast(msg) {
+// TRAINING SCENARIOS
+var scenarios = [
+  {
+    title: "ICE at your dorm door",
+    steps: [
+      {
+        situation: "🚪 It's 9pm. Someone knocks on your dorm room door and says: \"Federal agents. Open up.\" What do you do first?",
+        choices: ["Open the door to see their badge", "Keep the door closed and ask them to identify themselves through the door", "Call 911 immediately", "Run out the back"],
+        correct: 1,
+        feedback: "✓ Correct. You are never required to open the door. Ask through the closed door: \"Who are you and why are you here?\" Keep the door closed until you can verify their identity and see a judicial warrant."
+      },
+      {
+        situation: "🪪 Through the door, the agent says they have a warrant. They slide a document under the door. It says \"Form I-200\" and is signed by an ICE supervisor. What does this mean?",
+        choices: ["This is a valid warrant — you must open the door", "This is an administrative warrant — it does NOT require you to open the door", "You should sign it to show cooperation", "Call your RA immediately and open the door"],
+        correct: 1,
+        feedback: "✓ Correct. Form I-200 is an administrative warrant signed by ICE — not a federal judge. It does NOT give agents the right to enter your private residence. Only a judicial warrant signed by a federal judge requires you to open the door."
+      },
+      {
+        situation: "📞 The agent is still at the door. What should you do next?",
+        choices: ["Open the door and cooperate — it will be easier", "Stay calm, say 'I do not consent to entry,' and immediately call BU's legal rapid response line", "Argue with the agent through the door", "Post on social media about what's happening"],
+        correct: 1,
+        feedback: "✓ Correct. Say clearly: 'I do not consent to entry without a judicial warrant.' Then call BU Legal Rapid Response immediately. Do not open the door, do not sign anything, and do not answer questions about your immigration status."
+      }
+    ]
+  },
+  {
+    title: "Stopped on the street",
+    steps: [
+      {
+        situation: "🚶 You are walking near Commonwealth Ave when a plainclothes agent approaches and says: \"Stop. Are you a US citizen?\" What do you do?",
+        choices: ["Answer the question honestly", "Run away", "Calmly say: 'Am I free to leave?' and remain silent about your status", "Show your student ID to prove you go to BU"],
+        correct: 2,
+        feedback: "✓ Correct. You have the right to remain silent about your immigration status. Ask: 'Am I free to leave?' If they say yes, walk away calmly. If they say no, you are being detained — remain silent and ask for a lawyer."
+      },
+      {
+        situation: "🛑 The agent says you are NOT free to leave. They ask to see your ID and documents. What do you do?",
+        choices: ["Show your passport or visa — it will help your case", "Say: 'I choose to remain silent. I want to speak to a lawyer.' Do not show documents.", "Explain your student visa status in detail", "Give them your BU ID to de-escalate"],
+        correct: 1,
+        feedback: "✓ Correct. You are not required to show immigration documents to ICE on the street. Say: 'I choose to remain silent and I want to speak to a lawyer.' Do not answer questions. Do not sign anything. Memorize or save the BU legal line: (617) 353-XXXX."
+      },
+      {
+        situation: "👁️ After the encounter, you are shaken but safe. What should you do now?",
+        choices: ["Forget about it and continue your day", "Document everything — time, location, what was said, officer descriptions — and report to ISSO", "Post the agent's photo on social media", "Do nothing unless they come back"],
+        correct: 1,
+        feedback: "✓ Correct. Document the encounter as soon as possible: time, location, what was said, number of officers, vehicle descriptions. Report to BU ISSO at bu.edu/isso. This documentation may be important if legal action is needed."
+      }
+    ]
+  },
+  {
+    title: "Your friend is detained",
+    steps: [
+      {
+        situation: "😨 You are near the GSU when you see two plainclothes agents grab your classmate and push them toward an unmarked car. Your classmate is shouting your name. What do you do first?",
+        choices: ["Chase the car", "Stay back, record from a safe distance, and note the time and location", "Try to physically intervene", "Do nothing — it is a federal matter"],
+        correct: 1,
+        feedback: "✓ Correct. Do not physically intervene — it can put you and your classmate at greater risk. Stay at a safe distance, record if it is safe to do so, and note: exact time, location, car description and plates, number of officers, and what was said."
+      },
+      {
+        situation: "📱 The car has left. Your classmate is gone. Who do you contact first?",
+        choices: ["Post on Instagram to raise awareness", "Contact BU ISSO immediately and share all the details you documented", "Wait to see if your classmate calls you", "Contact a news station"],
+        correct: 1,
+        feedback: "✓ Correct. Contact BU ISSO immediately at bu.edu/isso. Share everything you documented. ISSO can contact legal partners and begin locating your classmate through the ICE Detainee Locator System. Time is critical — act fast."
+      },
+      {
+        situation: "🔍 ISSO asks if you know your classmate's immigration status or visa type. You are not sure. What information IS helpful to provide?",
+        choices: ["Guess their status based on where they're from", "Their full name, student ID, physical description, and details of the encounter", "Nothing — you don't want to get involved legally", "Only the car's license plate"],
+        correct: 1,
+        feedback: "✓ Correct. You do not need to know your classmate's immigration status to help. Provide: full name, BU student ID if known, physical description, time and location of detention, car description, and anything agents said. All of this helps ISSO and legal teams locate and assist your classmate."
+      }
+    ]
+  },
+  {
+    title: "Warrant verification",
+    steps: [
+      {
+        situation: "📄 An agent slides a document under your door. It is titled 'Warrant for Arrest of Alien' and is signed by 'Deportation Officer J. Smith, ICE ERO.' Is this a judicial warrant?",
+        choices: ["Yes — it says 'warrant' so it must be valid", "No — this is an administrative warrant signed by an ICE officer, not a federal judge", "Yes — any signed government document is a judicial warrant", "I cannot tell without a lawyer"],
+        correct: 1,
+        feedback: "✓ Correct. A warrant titled 'Warrant for Arrest of Alien' (Form I-200) is an administrative warrant signed by ICE — not a court. It does NOT authorize entry into your home or dorm. Only a warrant signed by a federal judge (magistrate or district court judge) requires you to open the door."
+      },
+      {
+        situation: "⚖️ What does a real judicial warrant look like?",
+        choices: ["It is signed by a DHS official", "It is issued by a federal court, signed by a judge, and specifies the premises to be searched or the person to be arrested", "It has the ICE logo and a badge number", "It is always printed on official DHS letterhead"],
+        correct: 1,
+        feedback: "✓ Correct. A judicial warrant must be: (1) issued by a federal court, (2) signed by a federal judge or magistrate, and (3) specifically name the location to be searched or the person to be arrested. If it does not meet all three criteria, you are not required to open your door."
+      },
+      {
+        situation: "🤔 An agent shows you a document that looks official but you are not sure if it is a judicial warrant. What do you do?",
+        choices: ["Open the door to inspect it more closely", "Keep the door closed, ask them to slide it under, read it carefully, and call BU Legal Rapid Response before doing anything", "Assume it is valid and cooperate", "Take a photo of it through the peephole and post it online"],
+        correct: 1,
+        feedback: "✓ Correct. Keep the door closed. Ask them to slide the document under. Read it carefully: does it name a federal judge? Does it list your specific address? If you are unsure, call BU Legal Rapid Response at (617) 353-XXXX before taking any action. When in doubt — door stays closed."
+      }
+    ]
+  }
+];
+
+var currentScenario = 0;
+var currentStep = 0;
+var answered = false;
+
+function startScenario(idx) {
+  currentScenario = idx;
+  currentStep = 0;
+  answered = false;
+  document.getElementById('training-home').style.display = 'none';
+  document.getElementById('training-scenario').style.display = 'block';
+  renderStep();
+}
+
+function renderStep() {
+  answered = false;
+  var sc = scenarios[currentScenario];
+  var step = sc.steps[currentStep];
+  var total = sc.steps.length;
+  var pct = (currentStep / total) * 100;
+
+  document.getElementById('scenarioFill').style.width = pct + '%';
+  document.getElementById('scenarioStep').textContent = 'Step ' + (currentStep+1) + ' of ' + total;
+  document.getElementById('scenarioBox').textContent = step.situation;
+
+  var choices = document.getElementById('scenarioChoices');
+  choices.innerHTML = '';
+  choices.style.display = 'flex';
+  step.choices.forEach(function(c, i) {
+    var btn = document.createElement('button');
+    btn.className = 'scenario-choice';
+    btn.textContent = c;
+    btn.onclick = function() { selectChoice(i); };
+    choices.appendChild(btn);
+  });
+
+  document.getElementById('scenarioFeedback').style.display = 'none';
+  document.getElementById('scenarioNext').style.display = 'none';
+  document.getElementById('scenarioRestart').style.display = 'none';
+}
+
+function selectChoice(idx) {
+  if (answered) return;
+  answered = true;
+  var step = scenarios[currentScenario].steps[currentStep];
+  var btns = document.querySelectorAll('.scenario-choice');
+  btns.forEach(function(b, i) {
+    b.style.pointerEvents = 'none';
+    if (i === step.correct) b.classList.add('correct');
+    else if (i === idx && idx !== step.correct) b.classList.add('wrong');
+  });
+  var fb = document.getElementById('scenarioFeedback');
+  fb.textContent = step.feedback;
+  fb.className = 'scenario-feedback' + (idx === step.correct ? ' good' : '');
+  fb.style.display = 'block';
+
+  var isLast = currentStep >= scenarios[currentScenario].steps.length - 1;
+  if (isLast) {
+    document.getElementById('scenarioNext').style.display = 'none';
+    document.getElementById('scenarioRestart').style.display = 'block';
+    document.getElementById('scenarioFill').style.width = '100%';
+    document.getElementById('scenarioStep').textContent = 'Complete ✓';
+  } else {
+    document.getElementById('scenarioNext').style.display = 'block';
+  }
+}
+
+function nextStep() {
+  currentStep++;
+  renderStep();
+}
+
+function backToTrainingHome() {
+  document.getElementById('training-home').style.display = 'block';
+  document.getElementById('training-scenario').style.display = 'none';
+}
+
+
   const t = document.getElementById('toast'); t.textContent=msg; t.style.display='block';
   setTimeout(()=>t.style.display='none', 2600);
 }
