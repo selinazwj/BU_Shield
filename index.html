@@ -48,6 +48,7 @@ main { flex:1; overflow-y:auto; padding-bottom:72px; }
 
 /* SUPPORT HOME */
 .support-home { padding:20px; display:flex; flex-direction:column; gap:10px; }
+.support-home-hidden { display:none !important; }
 .support-sub { display:none; }
 .support-sub.active { display:block; }
 .sub-header { display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid var(--border); background:white; position:sticky; top:0; z-index:10; }
@@ -636,14 +637,29 @@ function showTab(tabId, btn) {
 }
 
 function showSub(id) {
-  document.getElementById('support-home').style.display = 'none';
-  document.querySelectorAll('.support-sub').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+  var home = document.getElementById('support-home');
+  home.style.setProperty('display', 'none', 'important');
+  document.querySelectorAll('.support-sub').forEach(function(s) {
+    s.classList.remove('active');
+    s.style.display = 'none';
+  });
+  var target = document.getElementById(id);
+  target.style.display = 'block';
+  target.classList.add('active');
 }
 
 function showSupportHome() {
-  document.getElementById('support-home').style.display = 'flex';
-  document.querySelectorAll('.support-sub').forEach(s => s.classList.remove('active'));
+  var home = document.getElementById('support-home');
+  home.style.removeProperty('display');
+  home.style.display = 'flex';
+  document.querySelectorAll('.support-sub').forEach(function(s) {
+    s.classList.remove('active');
+    s.style.display = 'none';
+  });
+  var th = document.getElementById('training-home');
+  var ts = document.getElementById('training-scenario');
+  if (th) th.style.display = 'block';
+  if (ts) ts.style.display = 'none';
 }
 
 var map = L.map('map', {zoomControl:false}).setView([42.3505, -71.1054], 14);
