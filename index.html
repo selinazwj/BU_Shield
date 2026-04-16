@@ -4,902 +4,606 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#CC0000">
 <title>BU Shield</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 :root {
-  --red: #CC0000; --red-dark: #990000; --red-light: #fff0f0;
-  --black: #0f0f0f; --gray: #6b7280; --gray-light: #f5f5f5;
-  --border: #e5e7eb; --white: #ffffff; --r: 16px; --rs: 10px;
+  --red:#CC0000; --red-dark:#990000; --red-light:#fff0f0;
+  --black:#0f0f0f; --gray:#6b7280; --gl:#f5f5f5;
+  --border:#e5e7eb; --white:#fff; --r:16px; --rs:10px;
 }
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-body { font-family:'DM Sans',sans-serif; background:#e8e8e8; min-height:100vh; display:flex; justify-content:center; }
-.phone { width:100%; max-width:430px; min-height:100vh; background:var(--white); display:flex; flex-direction:column; }
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{font-family:'DM Sans',sans-serif;background:#e0e0e0;display:flex;justify-content:center;min-height:100vh;}
+.phone{width:100%;max-width:430px;min-height:100vh;background:var(--white);display:flex;flex-direction:column;position:relative;}
 
 /* HEADER */
-header { background:var(--red); padding:14px 20px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:100; box-shadow:0 2px 12px rgba(204,0,0,.25); flex-shrink:0; }
-.logo { display:flex; align-items:center; gap:10px; color:white; }
-.logo-bu { font-family:'DM Mono',monospace; font-size:22px; letter-spacing:-1px; }
-.logo-shield { font-size:12px; font-weight:700; letter-spacing:3px; opacity:.8; border-left:1.5px solid rgba(255,255,255,.35); padding-left:10px; }
-.live-badge { background:rgba(255,255,255,.18); color:white; font-size:11px; font-weight:700; padding:4px 10px; border-radius:20px; display:flex; align-items:center; gap:5px; }
-.live-dot { width:6px; height:6px; background:#4ade80; border-radius:50%; animation:pulse-dot 1.5s infinite; }
-@keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.3)} }
+header{background:var(--red);padding:14px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(204,0,0,.25);}
+.logo{display:flex;align-items:center;gap:10px;color:white;}
+.logo-bu{font-family:'DM Mono',monospace;font-size:22px;letter-spacing:-1px;}
+.logo-shield{font-size:12px;font-weight:700;letter-spacing:3px;opacity:.8;border-left:1.5px solid rgba(255,255,255,.35);padding-left:10px;}
+.live-badge{background:rgba(255,255,255,.18);color:white;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;display:flex;align-items:center;gap:5px;}
+.live-dot{width:6px;height:6px;background:#4ade80;border-radius:50%;animation:pdot 1.5s infinite;}
+@keyframes pdot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
 
-/* MAIN */
-main { flex:1; overflow-y:auto; padding-bottom:72px; }
-.tab-content { display:none; }
-.tab-content.active { display:block; }
-
-/* MAP */
-#map { height:320px; width:100%; z-index:1; position:relative; }
-.leaflet-pane,.leaflet-top,.leaflet-bottom { z-index:1 !important; }
-.map-controls { padding:16px 20px; display:flex; flex-direction:column; gap:12px; }
-.report-btn { width:100%; background:var(--red); color:white; border:none; padding:16px; border-radius:var(--r); font-family:'DM Sans',sans-serif; font-size:15px; font-weight:700; letter-spacing:.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:background .2s,transform .1s; }
-.report-btn:active { transform:scale(.98); background:var(--red-dark); }
-.activity-card { background:var(--gray-light); border-radius:var(--rs); padding:13px 15px; border-left:3px solid #f97316; }
-.activity-card.red { border-left-color:#ef4444; }
-.activity-label { font-size:10px; font-weight:700; color:var(--gray); text-transform:uppercase; letter-spacing:1px; margin-bottom:3px; }
-.activity-text { font-size:13px; color:var(--black); }
-.activity-time { font-size:11px; color:var(--gray); margin-top:2px; }
-
-/* SUPPORT HOME */
-.support-home { padding:20px; display:flex; flex-direction:column; gap:10px; }
-.support-home-hidden { display:none !important; }
-.support-sub { display:none; }
-.support-sub.active { display:block; }
-.sub-header { display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid var(--border); background:white; position:sticky; top:0; z-index:10; }
-.back-btn { background:none; border:none; cursor:pointer; color:var(--red); font-size:22px; line-height:1; padding:0 8px 0 0; }
-.sub-header-title { font-size:16px; font-weight:700; color:var(--black); }
-.sub-content { padding:20px; display:flex; flex-direction:column; gap:13px; }
-
-/* EMERGENCY CARD */
-.emergency-card { background:var(--red); color:white; border-radius:var(--r); padding:20px; }
-.emergency-label { font-size:10px; font-weight:700; letter-spacing:2px; opacity:.75; text-transform:uppercase; margin-bottom:4px; }
-.emergency-title { font-size:17px; font-weight:700; margin-bottom:8px; }
-.emergency-number { font-family:'DM Mono',monospace; font-size:26px; letter-spacing:-.5px; margin-bottom:4px; }
-.emergency-sub { font-size:12px; opacity:.7; }
-.call-btn { display:block; margin-top:14px; background:white; color:var(--red); border:none; border-radius:var(--rs); padding:12px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:700; text-align:center; cursor:pointer; text-decoration:none; }
-
-/* SECTION LABEL */
-.section-label { font-size:11px; font-weight:700; color:var(--gray); text-transform:uppercase; letter-spacing:1px; padding-top:4px; }
-
-/* MENU CARDS */
-.menu-card { display:flex; align-items:center; gap:14px; background:var(--gray-light); border-radius:var(--r); padding:15px 16px; cursor:pointer; transition:background .15s; }
-.menu-card:active { background:#ebebeb; }
-.menu-icon { width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:18px; }
-.menu-icon.red { background:var(--red-light); }
-.menu-icon.blue { background:#eff6ff; }
-.menu-icon.green { background:#f0fdf4; }
-.menu-icon.purple { background:#faf5ff; }
-.menu-icon.orange { background:#fff7ed; }
-.menu-text { flex:1; }
-.menu-title { font-size:14px; font-weight:700; color:var(--black); margin-bottom:2px; }
-.menu-sub { font-size:12px; color:var(--gray); }
-.menu-arrow { color:#d1d5db; font-size:18px; flex-shrink:0; }
-
-/* LIST CARDS */
-.list-card { background:var(--gray-light); border-radius:var(--rs); padding:13px 15px; }
-.list-name { font-size:13px; font-weight:700; color:var(--black); margin-bottom:3px; }
-.list-desc { font-size:12px; color:var(--gray); margin-bottom:7px; line-height:1.5; }
-.list-link { font-size:12px; font-weight:700; color:var(--red); text-decoration:none; }
-
-/* BREATHE */
-.breathe-card { background:var(--black); border-radius:var(--r); padding:28px 20px; display:flex; flex-direction:column; align-items:center; gap:16px; cursor:pointer; }
-.breathe-ring-wrap { width:110px; height:110px; border-radius:50%; border:2px solid rgba(255,255,255,.15); display:flex; align-items:center; justify-content:center; position:relative; }
-.breathe-ring { position:absolute; inset:0; border-radius:50%; border:2px solid white; animation:breathe-anim 8s ease-in-out infinite; }
-@keyframes breathe-anim { 0%,100%{transform:scale(.7);opacity:.3} 40%{transform:scale(1);opacity:1} 60%{transform:scale(1);opacity:1} }
-.breathe-label { font-size:15px; color:white; font-weight:700; }
-.breathe-hint { font-size:12px; color:rgba(255,255,255,.4); text-align:center; line-height:1.6; }
-
-/* CHAT */
-.chat-card { background:var(--gray-light); border-radius:var(--r); overflow:hidden; }
-.chat-messages { padding:16px; display:flex; flex-direction:column; gap:10px; min-height:180px; }
-.chat-bubble { max-width:80%; padding:10px 13px; border-radius:14px; font-size:13px; line-height:1.5; }
-.chat-bubble.them { background:white; color:var(--black); align-self:flex-start; border-bottom-left-radius:4px; }
-.chat-bubble.me { background:var(--red); color:white; align-self:flex-end; border-bottom-right-radius:4px; }
-.chat-input-row { display:flex; gap:8px; padding:10px 12px; border-top:1px solid var(--border); background:white; }
-.chat-input { flex:1; border:1.5px solid var(--border); border-radius:20px; padding:9px 14px; font-family:'DM Sans',sans-serif; font-size:13px; outline:none; }
-.chat-input:focus { border-color:var(--red); }
-.chat-send { background:var(--red); color:white; border:none; width:36px; height:36px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-
-/* BOARD */
-.board-msg { background:var(--gray-light); border-radius:var(--rs); padding:12px 14px; border-left:3px solid var(--red); }
-.board-text { font-size:13px; color:var(--black); font-style:italic; line-height:1.5; }
-.board-meta { display:flex; justify-content:space-between; align-items:center; margin-top:6px; }
-.board-author { font-size:11px; color:var(--gray); font-weight:600; }
-.reply-toggle { font-size:11px; font-weight:700; color:var(--red); background:none; border:none; cursor:pointer; }
-.reply-thread { display:none; margin-top:8px; padding-top:8px; border-top:1px solid var(--border); }
-.reply-thread.open { display:block; }
-.reply-item { font-size:12px; color:#374151; background:white; border-radius:8px; padding:8px 10px; line-height:1.4; }
-.post-area { display:flex; flex-direction:column; gap:8px; }
-.post-area-label { font-size:11px; font-weight:700; color:var(--gray); text-transform:uppercase; letter-spacing:.5px; }
-.post-input { width:100%; border:1.5px solid var(--border); border-radius:var(--rs); padding:10px 14px; font-family:'DM Sans',sans-serif; font-size:13px; color:var(--black); resize:none; outline:none; }
-.post-input:focus { border-color:var(--red); }
-.post-btn { background:var(--black); color:white; border:none; border-radius:var(--rs); padding:11px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:700; cursor:pointer; }
-
-/* UNI CARDS */
-.uni-card { display:flex; justify-content:space-between; align-items:center; background:var(--gray-light); border-radius:var(--rs); padding:12px 14px; text-decoration:none; border:1.5px solid transparent; transition:border-color .15s; }
-.uni-card:active { border-color:var(--red); }
-.uni-name { font-size:13px; font-weight:700; color:var(--black); margin-bottom:2px; }
-.uni-desc { font-size:11px; color:var(--gray); }
-.uni-arrow { color:#d1d5db; font-size:14px; }
-
-/* HEART */
-.heart-footer { text-align:center; padding:10px 0 6px; font-size:12px; color:var(--gray); line-height:1.8; }
-.heart-footer span { color:var(--red); }
-
-/* LEGAL */
-.legal-section { padding:20px; display:flex; flex-direction:column; gap:14px; }
-.legal-card { background:var(--black); border-radius:var(--r); padding:24px 20px; color:white; position:relative; overflow:hidden; }
-.legal-card-bg { position:absolute; right:-10px; top:-10px; font-size:80px; opacity:.05; line-height:1; }
-.legal-card-label { font-size:10px; font-weight:700; letter-spacing:2px; color:var(--red); text-transform:uppercase; margin-bottom:10px; }
-.legal-card-title { font-size:20px; font-weight:700; margin-bottom:14px; }
-.legal-statement { background:rgba(255,255,255,.07); border-left:3px solid var(--red); border-radius:0 var(--rs) var(--rs) 0; padding:13px 15px; font-size:14px; line-height:1.6; color:rgba(255,255,255,.9); margin-bottom:18px; }
-.legal-contact-label { font-size:10px; font-weight:700; letter-spacing:2px; color:rgba(255,255,255,.35); text-transform:uppercase; margin-bottom:3px; }
-.legal-contact-name { font-size:14px; font-weight:700; margin-bottom:3px; }
-.legal-contact-number { font-family:'DM Mono',monospace; font-size:21px; color:var(--red); }
-.legal-call-btn { display:block; margin-top:13px; background:var(--red); color:white; border:none; border-radius:var(--rs); padding:12px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:700; text-align:center; text-decoration:none; width:100%; cursor:pointer; }
-.warrant-explainer { background:var(--red-light); border:1px solid #fecaca; border-radius:var(--r); padding:16px 18px; }
-.warrant-title { font-size:12px; font-weight:700; color:var(--red); text-transform:uppercase; letter-spacing:.5px; margin-bottom:10px; }
-.warrant-row { display:flex; gap:8px; margin-bottom:8px; }
-.warrant-type { flex:1; background:white; border-radius:var(--rs); padding:11px; text-align:center; }
-.warrant-type-name { font-size:11px; font-weight:700; margin-bottom:4px; }
-.warrant-type-name.bad { color:var(--red); }
-.warrant-type-name.good { color:#15803d; }
-.warrant-type-desc { font-size:11px; color:var(--gray); line-height:1.4; }
-.warrant-note { font-size:11px; color:#991b1b; font-weight:600; margin-top:4px; }
-.checklist { background:var(--gray-light); border-radius:var(--r); padding:16px 18px; display:flex; flex-direction:column; gap:11px; }
-.check-item { display:flex; align-items:flex-start; gap:10px; font-size:14px; color:var(--black); line-height:1.4; }
-.check-icon { width:20px; height:20px; background:#dcfce7; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; flex-shrink:0; margin-top:1px; }
+/* PAGES - only one visible at a time */
+.page{display:none;flex-direction:column;flex:1;overflow-y:auto;padding-bottom:72px;}
+.page.active{display:flex;}
 
 /* NAV */
-nav { position:fixed; bottom:0; width:100%; max-width:430px; background:white; border-top:1px solid #f0f0f0; display:flex; padding:10px 0 20px; z-index:100; box-shadow:0 -4px 20px rgba(0,0,0,.06); }
-.nav-btn { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; background:none; border:none; cursor:pointer; padding:6px 0; }
-.nav-label { font-family:'DM Sans',sans-serif; font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#9ca3af; }
-.nav-btn svg { stroke:#9ca3af; transition:stroke .2s; }
-.nav-btn.active svg { stroke:var(--red); }
-.nav-btn.active .nav-label { color:var(--red); }
+nav{position:fixed;bottom:0;width:100%;max-width:430px;background:white;border-top:1px solid #f0f0f0;display:flex;padding:10px 0 20px;z-index:50;box-shadow:0 -4px 16px rgba(0,0,0,.06);}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:pointer;padding:6px 0;}
+.nb svg{stroke:#9ca3af;transition:stroke .2s;}
+.nb span{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#9ca3af;}
+.nb.on svg{stroke:var(--red);}
+.nb.on span{color:var(--red);}
 
-/* MODALS */
-.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:1000; justify-content:flex-end; flex-direction:column; }
-.modal-overlay.open { display:flex; }
-.modal { background:white; border-radius:24px 24px 0 0; padding:24px 20px 40px; animation:slideUp .3s ease; max-height:90vh; overflow-y:auto; }
-@keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
-.modal-handle { width:36px; height:4px; background:#e5e7eb; border-radius:2px; margin:0 auto 20px; }
-.modal-title { font-size:18px; font-weight:700; margin-bottom:14px; color:var(--black); }
-.anon-note { background:#f0fdf4; border:1px solid #bbf7d0; border-radius:var(--rs); padding:10px 14px; font-size:12px; color:#15803d; display:flex; align-items:center; gap:8px; margin-bottom:14px; }
-.form-group { margin-bottom:13px; }
-.form-label { font-size:11px; font-weight:700; color:var(--gray); text-transform:uppercase; letter-spacing:.5px; margin-bottom:5px; display:block; }
-.form-input,.form-textarea,.form-select { width:100%; border:1.5px solid var(--border); border-radius:var(--rs); padding:11px 13px; font-family:'DM Sans',sans-serif; font-size:14px; color:var(--black); background:white; outline:none; transition:border-color .2s; }
-.form-input:focus,.form-textarea:focus,.form-select:focus { border-color:var(--red); }
-.form-textarea { resize:none; height:78px; }
-.photo-upload { width:100%; border:2px dashed #e5e7eb; border-radius:var(--rs); padding:18px; text-align:center; cursor:pointer; background:var(--gray-light); transition:border-color .2s,background .2s; }
-.photo-upload:hover { border-color:var(--red); background:var(--red-light); }
-.photo-upload-icon { font-size:26px; margin-bottom:5px; }
-.photo-upload-text { font-size:13px; color:var(--gray); font-weight:500; }
-#photoPreview { display:none; margin-top:10px; border-radius:var(--rs); overflow:hidden; }
-#photoPreview img { width:100%; max-height:150px; object-fit:cover; }
-.submit-btn { width:100%; background:var(--red); color:white; border:none; padding:15px; border-radius:var(--r); font-family:'DM Sans',sans-serif; font-size:15px; font-weight:700; cursor:pointer; margin-top:4px; }
-.submit-btn:active { background:var(--red-dark); }
-.cancel-btn { width:100%; background:none; border:none; padding:12px; font-family:'DM Sans',sans-serif; font-size:14px; color:var(--gray); cursor:pointer; margin-top:2px; }
-.breathe-modal { display:none; position:fixed; inset:0; background:var(--black); z-index:1100; flex-direction:column; align-items:center; justify-content:center; max-width:430px; margin:0 auto; }
-.breathe-modal.open { display:flex; }
-.breathe-circle { width:160px; height:160px; border:2px solid rgba(255,255,255,.15); border-radius:50%; display:flex; align-items:center; justify-content:center; margin-bottom:28px; position:relative; }
-.breathe-ring-full { position:absolute; inset:0; border-radius:50%; border:2px solid white; animation:breathe-anim 8s ease-in-out infinite; }
-.breathe-text { font-size:18px; color:white; font-weight:600; text-align:center; margin-bottom:8px; }
-.breathe-instruction { font-size:13px; color:rgba(255,255,255,.4); text-align:center; margin-bottom:36px; }
-.breathe-close { background:rgba(255,255,255,.1); color:white; border:none; padding:12px 32px; border-radius:20px; font-family:'DM Sans',sans-serif; font-size:14px; cursor:pointer; }
+/* MAP PAGE */
+#map{height:320px;width:100%;flex-shrink:0;}
+.leaflet-pane,.leaflet-top,.leaflet-bottom{z-index:2 !important;}
+.map-controls{padding:16px 20px;display:flex;flex-direction:column;gap:12px;}
+.report-btn{width:100%;background:var(--red);color:white;border:none;padding:16px;border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .2s;}
+.report-btn:active{background:var(--red-dark);}
+.acard{background:var(--gl);border-radius:var(--rs);padding:13px 15px;border-left:3px solid #f97316;}
+.acard.r{border-left-color:#ef4444;}
+.alabel{font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;}
+.atext{font-size:13px;color:var(--black);}
+.atime{font-size:11px;color:var(--gray);margin-top:2px;}
+
+/* SUPPORT PAGE */
+.s-home{padding:20px;display:flex;flex-direction:column;gap:10px;}
+.s-sub{display:none;flex-direction:column;flex:1;}
+.s-sub.on{display:flex;}
+.sub-hdr{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border);background:white;position:sticky;top:0;z-index:10;flex-shrink:0;}
+.back{background:none;border:none;cursor:pointer;color:var(--red);font-size:24px;line-height:1;padding:0 8px 0 0;}
+.sub-title{font-size:16px;font-weight:700;color:var(--black);}
+.sub-body{padding:20px;display:flex;flex-direction:column;gap:13px;overflow-y:auto;}
+
+/* CARDS */
+.em-card{background:var(--red);color:white;border-radius:var(--r);padding:20px;}
+.em-label{font-size:10px;font-weight:700;letter-spacing:2px;opacity:.75;text-transform:uppercase;margin-bottom:4px;}
+.em-title{font-size:17px;font-weight:700;margin-bottom:8px;}
+.em-num{font-family:'DM Mono',monospace;font-size:26px;letter-spacing:-.5px;margin-bottom:4px;}
+.em-sub{font-size:12px;opacity:.7;}
+.call-btn{display:block;margin-top:14px;background:white;color:var(--red);border:none;border-radius:var(--rs);padding:12px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;text-align:center;cursor:pointer;text-decoration:none;}
+.slabel{font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:1px;padding-top:4px;}
+.mc{display:flex;align-items:center;gap:14px;background:var(--gl);border-radius:var(--r);padding:15px 16px;cursor:pointer;transition:background .15s;}
+.mc:active{background:#e8e8e8;}
+.mi{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;}
+.mi.bl{background:#eff6ff;} .mi.gn{background:#f0fdf4;} .mi.pu{background:#faf5ff;} .mi.or{background:#fff7ed;} .mi.rd{background:var(--red-light);}
+.mt{flex:1;}
+.mt-title{font-size:14px;font-weight:700;color:var(--black);margin-bottom:2px;}
+.mt-sub{font-size:12px;color:var(--gray);}
+.ma{color:#d1d5db;font-size:18px;flex-shrink:0;}
+.hf{text-align:center;padding:10px 0 6px;font-size:12px;color:var(--gray);line-height:1.8;}
+.hf span{color:var(--red);}
+
+/* LIST */
+.lc{background:var(--gl);border-radius:var(--rs);padding:13px 15px;}
+.ln{font-size:13px;font-weight:700;color:var(--black);margin-bottom:3px;}
+.ld{font-size:12px;color:var(--gray);margin-bottom:7px;line-height:1.5;}
+.ll{font-size:12px;font-weight:700;color:var(--red);text-decoration:none;}
+
+/* UNI */
+.uc{display:flex;justify-content:space-between;align-items:center;background:var(--gl);border-radius:var(--rs);padding:12px 14px;text-decoration:none;border:1.5px solid transparent;}
+.uc:active{border-color:var(--red);}
+.un{font-size:13px;font-weight:700;color:var(--black);margin-bottom:2px;}
+.ud{font-size:11px;color:var(--gray);}
+.ua{color:#d1d5db;font-size:14px;}
+
+/* BREATHE */
+.breathe-card{background:var(--black);border-radius:var(--r);padding:28px 20px;display:flex;flex-direction:column;align-items:center;gap:16px;cursor:pointer;}
+.brw{width:110px;height:110px;border-radius:50%;border:2px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;position:relative;}
+.brr{position:absolute;inset:0;border-radius:50%;border:2px solid white;animation:ba 8s ease-in-out infinite;}
+@keyframes ba{0%,100%{transform:scale(.7);opacity:.3}40%{transform:scale(1);opacity:1}60%{transform:scale(1);opacity:1}}
+.brl{font-size:15px;color:white;font-weight:700;}
+.brh{font-size:12px;color:rgba(255,255,255,.4);text-align:center;line-height:1.6;}
+
+/* CHAT */
+.chat-wrap{background:var(--gl);border-radius:var(--r);overflow:hidden;}
+.chat-msgs{padding:16px;display:flex;flex-direction:column;gap:10px;min-height:180px;}
+.cb{max-width:80%;padding:10px 13px;border-radius:14px;font-size:13px;line-height:1.5;}
+.cb.them{background:white;color:var(--black);align-self:flex-start;border-bottom-left-radius:4px;}
+.cb.me{background:var(--red);color:white;align-self:flex-end;border-bottom-right-radius:4px;}
+.chat-row{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--border);background:white;}
+.chat-in{flex:1;border:1.5px solid var(--border);border-radius:20px;padding:9px 14px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;}
+.chat-in:focus{border-color:var(--red);}
+.chat-send{background:var(--red);color:white;border:none;width:36px;height:36px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* BOARD */
+.bm{background:var(--gl);border-radius:var(--rs);padding:12px 14px;border-left:3px solid var(--red);}
+.bt{font-size:13px;color:var(--black);font-style:italic;line-height:1.5;}
+.bmet{display:flex;justify-content:space-between;align-items:center;margin-top:6px;}
+.bauth{font-size:11px;color:var(--gray);font-weight:600;}
+.rtog{font-size:11px;font-weight:700;color:var(--red);background:none;border:none;cursor:pointer;}
+.rth{display:none;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
+.rth.on{display:block;}
+.ri{font-size:12px;color:#374151;background:white;border-radius:8px;padding:8px 10px;line-height:1.4;}
+.post-area{display:flex;flex-direction:column;gap:8px;}
+.palabel{font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;}
+.pi{width:100%;border:1.5px solid var(--border);border-radius:var(--rs);padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--black);resize:none;outline:none;}
+.pi:focus{border-color:var(--red);}
+.pb{background:var(--black);color:white;border:none;border-radius:var(--rs);padding:11px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
+
 /* TRAINING */
-.training-scenario-card { background:var(--gray-light); border-radius:var(--r); padding:16px 18px; cursor:pointer; border:1.5px solid transparent; transition:border-color .15s; }
-.training-scenario-card:active { border-color:var(--red); }
-.ts-badge { font-size:10px; font-weight:700; color:var(--red); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
-.ts-title { font-size:14px; font-weight:700; color:var(--black); margin-bottom:3px; }
-.ts-desc { font-size:12px; color:var(--gray); line-height:1.4; margin-bottom:8px; }
-.ts-start { font-size:12px; font-weight:700; color:var(--red); }
-.scenario-progress { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
-.scenario-bar { flex:1; height:4px; background:#e5e7eb; border-radius:2px; overflow:hidden; }
-.scenario-fill { height:100%; background:var(--red); border-radius:2px; transition:width .4s ease; }
-.scenario-step { font-size:11px; font-weight:700; color:var(--gray); white-space:nowrap; }
-.scenario-box { background:var(--black); color:white; border-radius:var(--r); padding:18px; font-size:14px; line-height:1.7; margin-bottom:14px; }
-.scenario-choice { background:var(--gray-light); border:1.5px solid var(--border); border-radius:var(--rs); padding:13px 15px; font-size:13px; color:var(--black); cursor:pointer; font-family:'DM Sans',sans-serif; text-align:left; width:100%; transition:border-color .15s; line-height:1.4; }
-.scenario-choice:active { border-color:var(--red); }
-.scenario-choice.correct { background:#f0fdf4; border-color:#22c55e; color:#15803d; }
-.scenario-choice.wrong { background:#fff0f0; border-color:var(--red); color:var(--red); }
-.scenario-feedback { background:var(--gray-light); border-radius:var(--rs); padding:13px 15px; font-size:13px; line-height:1.6; color:var(--black); border-left:3px solid var(--red); margin-top:4px; }
-.scenario-feedback.good { border-left-color:#22c55e; background:#f0fdf4; }
+.tsc{background:var(--gl);border-radius:var(--r);padding:16px 18px;cursor:pointer;border:1.5px solid transparent;transition:border-color .15s;}
+.tsc:active{border-color:var(--red);}
+.ts-badge{font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.ts-title{font-size:14px;font-weight:700;color:var(--black);margin-bottom:3px;}
+.ts-desc{font-size:12px;color:var(--gray);line-height:1.4;margin-bottom:8px;}
+.ts-go{font-size:12px;font-weight:700;color:var(--red);}
+.sprog{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.sbar{flex:1;height:4px;background:#e5e7eb;border-radius:2px;overflow:hidden;}
+.sfill{height:100%;background:var(--red);border-radius:2px;transition:width .4s ease;}
+.sstep{font-size:11px;font-weight:700;color:var(--gray);white-space:nowrap;}
+.sbox{background:var(--black);color:white;border-radius:var(--r);padding:18px;font-size:14px;line-height:1.7;margin-bottom:14px;}
+.schoice{background:var(--gl);border:1.5px solid var(--border);border-radius:var(--rs);padding:13px 15px;font-size:13px;color:var(--black);cursor:pointer;font-family:'DM Sans',sans-serif;text-align:left;width:100%;line-height:1.4;}
+.schoice.ok{background:#f0fdf4;border-color:#22c55e;color:#15803d;}
+.schoice.no{background:var(--red-light);border-color:var(--red);color:var(--red);}
+.sfeedback{background:var(--gl);border-radius:var(--rs);padding:13px 15px;font-size:13px;line-height:1.6;color:var(--black);border-left:3px solid var(--red);margin-top:4px;display:none;}
+.sfeedback.ok{border-left-color:#22c55e;background:#f0fdf4;}
+.snext{background:var(--black);color:white;border:none;border-radius:var(--rs);padding:11px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;width:100%;margin-top:4px;display:none;}
+.srestart{background:none;border:none;color:var(--red);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;padding:8px 0;display:none;}
 
-.toast { display:none; position:fixed; top:80px; left:50%; transform:translateX(-50%); background:var(--black); color:white; padding:11px 20px; border-radius:20px; font-size:13px; font-weight:600; z-index:1200; white-space:nowrap; animation:toastAnim 2.5s ease forwards; max-width:90%; }
-@keyframes toastAnim { 0%{opacity:0;transform:translateX(-50%) translateY(-10px)} 15%{opacity:1;transform:translateX(-50%) translateY(0)} 75%{opacity:1} 100%{opacity:0} }
+/* LEGAL PAGE */
+.legal-wrap{padding:20px;display:flex;flex-direction:column;gap:14px;}
+.lcard{background:var(--black);border-radius:var(--r);padding:24px 20px;color:white;position:relative;overflow:hidden;}
+.lcard-bg{position:absolute;right:-10px;top:-10px;font-size:80px;opacity:.05;line-height:1;}
+.lcard-lbl{font-size:10px;font-weight:700;letter-spacing:2px;color:var(--red);text-transform:uppercase;margin-bottom:10px;}
+.lcard-h{font-size:20px;font-weight:700;margin-bottom:14px;}
+.lstmt{background:rgba(255,255,255,.07);border-left:3px solid var(--red);border-radius:0 var(--rs) var(--rs) 0;padding:13px 15px;font-size:14px;line-height:1.6;color:rgba(255,255,255,.9);margin-bottom:18px;}
+.lcl{font-size:10px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.35);text-transform:uppercase;margin-bottom:3px;}
+.lcn{font-size:14px;font-weight:700;margin-bottom:3px;}
+.lcnum{font-family:'DM Mono',monospace;font-size:21px;color:var(--red);}
+.lcbtn{display:block;margin-top:13px;background:var(--red);color:white;border:none;border-radius:var(--rs);padding:12px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;text-align:center;text-decoration:none;width:100%;cursor:pointer;}
+.wexp{background:var(--red-light);border:1px solid #fecaca;border-radius:var(--r);padding:16px 18px;}
+.wtitle{font-size:12px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;}
+.wrow{display:flex;gap:8px;margin-bottom:8px;}
+.wt{flex:1;background:white;border-radius:var(--rs);padding:11px;text-align:center;}
+.wtn{font-size:11px;font-weight:700;margin-bottom:4px;}
+.wtn.bad{color:var(--red);} .wtn.ok{color:#15803d;}
+.wtd{font-size:11px;color:var(--gray);line-height:1.4;}
+.wnote{font-size:11px;color:#991b1b;font-weight:600;margin-top:4px;}
+.cklist{background:var(--gl);border-radius:var(--r);padding:16px 18px;display:flex;flex-direction:column;gap:11px;}
+.cki{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--black);line-height:1.4;}
+.ckico{width:20px;height:20px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;margin-top:1px;}
+
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;flex-direction:column;justify-content:flex-end;}
+.overlay.on{display:flex;}
+.modal{background:white;border-radius:24px 24px 0 0;padding:24px 20px 40px;animation:sup .3s ease;max-height:90vh;overflow-y:auto;}
+@keyframes sup{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.mhandle{width:36px;height:4px;background:#e5e7eb;border-radius:2px;margin:0 auto 20px;}
+.mtitle{font-size:18px;font-weight:700;margin-bottom:14px;color:var(--black);}
+.anote{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:var(--rs);padding:10px 14px;font-size:12px;color:#15803d;display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.fg{margin-bottom:13px;}
+.flbl{font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;display:block;}
+.fin,.fta,.fsel{width:100%;border:1.5px solid var(--border);border-radius:var(--rs);padding:11px 13px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--black);background:white;outline:none;transition:border-color .2s;}
+.fin:focus,.fta:focus,.fsel:focus{border-color:var(--red);}
+.fta{resize:none;height:78px;}
+.pup{width:100%;border:2px dashed #e5e7eb;border-radius:var(--rs);padding:18px;text-align:center;cursor:pointer;background:var(--gl);}
+.pup:hover{border-color:var(--red);background:var(--red-light);}
+.pico{font-size:26px;margin-bottom:5px;}
+.ptxt{font-size:13px;color:var(--gray);font-weight:500;}
+#pp{display:none;margin-top:10px;border-radius:var(--rs);overflow:hidden;}
+#pp img{width:100%;max-height:150px;object-fit:cover;}
+.sbtn{width:100%;background:var(--red);color:white;border:none;padding:15px;border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px;}
+.sbtn:active{background:var(--red-dark);}
+.cbtn{width:100%;background:none;border:none;padding:12px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--gray);cursor:pointer;margin-top:2px;}
+
+/* BREATHE FULLSCREEN */
+.bfull{display:none;position:fixed;inset:0;background:var(--black);z-index:300;flex-direction:column;align-items:center;justify-content:center;max-width:430px;margin:0 auto;}
+.bfull.on{display:flex;}
+.bcirc{width:160px;height:160px;border:2px solid rgba(255,255,255,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:28px;position:relative;}
+.bring{position:absolute;inset:0;border-radius:50%;border:2px solid white;animation:ba 8s ease-in-out infinite;}
+.btxt{font-size:18px;color:white;font-weight:600;text-align:center;margin-bottom:8px;}
+.bins{font-size:13px;color:rgba(255,255,255,.4);text-align:center;margin-bottom:36px;}
+.bclose{background:rgba(255,255,255,.1);color:white;border:none;padding:12px 32px;border-radius:20px;font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;}
+
+/* TOAST */
+.toast{display:none;position:fixed;top:80px;left:50%;transform:translateX(-50%);background:var(--black);color:white;padding:11px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:400;white-space:nowrap;animation:ta 2.5s ease forwards;max-width:90%;}
+@keyframes ta{0%{opacity:0;transform:translateX(-50%) translateY(-10px)}15%{opacity:1;transform:translateX(-50%) translateY(0)}75%{opacity:1}100%{opacity:0}}
 </style>
 </head>
 <body>
 <div class="phone">
   <header>
-    <div class="logo">
-      <span class="logo-bu">BU</span>
-      <span class="logo-shield">SHIELD</span>
-    </div>
+    <div class="logo"><span class="logo-bu">BU</span><span class="logo-shield">SHIELD</span></div>
     <div class="live-badge"><div class="live-dot"></div>LIVE</div>
   </header>
 
-  <main>
+  <!-- ══ PAGE 1: MAP ══ -->
+  <div class="page active" id="pg-map">
+    <div id="map"></div>
+    <div class="map-controls">
+      <button class="report-btn" onclick="openModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        REPORT ANONYMOUSLY
+      </button>
+      <div class="acard"><div class="alabel">Recent Activity</div><div class="atext">2 verified reports near Allston Car Wash</div><div class="atime">10 min ago · auto-deletes in 3h 50m</div></div>
+      <div class="acard r"><div class="alabel">Alert</div><div class="atext">Plainclothes vehicles near Commonwealth Ave</div><div class="atime">32 min ago · photo attached</div></div>
+    </div>
+  </div>
 
-    <!-- MAP TAB -->
-    <section id="map-tab" class="tab-content active">
-      <div id="map"></div>
-      <div class="map-controls">
-        <button class="report-btn" onclick="openModal()">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          REPORT ANONYMOUSLY
-        </button>
-        <div class="activity-card">
-          <div class="activity-label">Recent Activity</div>
-          <div class="activity-text">2 verified reports near Allston Car Wash</div>
-          <div class="activity-time">10 min ago · auto-deletes in 3h 50m</div>
+  <!-- ══ PAGE 2: SUPPORT ══ -->
+  <div class="page" id="pg-support">
+
+    <!-- HOME -->
+    <div class="s-home" id="s-home">
+      <div class="em-card">
+        <div class="em-label">Emergency Legal Line</div>
+        <div class="em-title">BU Legal Rapid Response</div>
+        <div class="em-num">(617) 353-XXXX</div>
+        <div class="em-sub">Available 24/7 · Confidential</div>
+        <a href="tel:+16173530000" class="call-btn">Call Now</a>
+      </div>
+      <div class="slabel">Mental Health</div>
+      <div class="mc" onclick="openSub('s-breathe')"><div class="mi bl">🧘</div><div class="mt"><div class="mt-title">Breathing Exercise</div><div class="mt-sub">4-7-8 guided relaxation</div></div><span class="ma">›</span></div>
+      <div class="mc" onclick="openSub('s-chat')"><div class="mi gn">💬</div><div class="mt"><div class="mt-title">Anonymous Chat</div><div class="mt-sub">Talk to a peer supporter now</div></div><span class="ma">›</span></div>
+      <div class="mc" onclick="openSub('s-psych')"><div class="mi pu">🧠</div><div class="mt"><div class="mt-title">Psychological Resources</div><div class="mt-sub">CAPS, crisis lines, therapist directory</div></div><span class="ma">›</span></div>
+      <div class="slabel">Training</div>
+      <div class="mc" onclick="openSub('s-training')"><div class="mi bl">📋</div><div class="mt"><div class="mt-title">Know Your Rights Training</div><div class="mt-sub">Interactive scenarios · 5 min</div></div><span class="ma">›</span></div>
+      <div class="slabel">Community</div>
+      <div class="mc" onclick="openSub('s-board')"><div class="mi or">🗣️</div><div class="mt"><div class="mt-title">Community Board</div><div class="mt-sub">"What do I do if…" — ask anonymously</div></div><span class="ma">›</span></div>
+      <div class="mc" onclick="openSub('s-unis')"><div class="mi rd">🏛️</div><div class="mt"><div class="mt-title">Other Universities</div><div class="mt-sub">Resources from peer institutions</div></div><span class="ma">›</span></div>
+      <div class="slabel">Legal</div>
+      <div class="mc" onclick="openSub('s-legal')"><div class="mi rd">⚖️</div><div class="mt"><div class="mt-title">Legal Resources & Hotlines</div><div class="mt-sub">ISSO, ACLU, immigration hotlines</div></div><span class="ma">›</span></div>
+      <div class="hf">Made with <span>♥</span> for the BU community.<br>You are not alone.</div>
+    </div>
+
+    <!-- SUB: BREATHE -->
+    <div class="s-sub" id="s-breathe">
+      <div class="sub-hdr"><button class="back" onclick="closeSub()">‹</button><span class="sub-title">Breathing Exercise</span></div>
+      <div class="sub-body">
+        <p style="font-size:13px;color:var(--gray);line-height:1.6;">The 4-7-8 technique can calm your nervous system in under two minutes.</p>
+        <div class="breathe-card" onclick="openBreathe()">
+          <div class="brw"><div class="brr"></div><span style="font-size:28px;">🫁</span></div>
+          <div class="brl">Tap to Start</div>
+          <div class="brh">Inhale 4s · Hold 7s · Exhale 8s</div>
         </div>
-        <div class="activity-card red">
-          <div class="activity-label">Alert</div>
-          <div class="activity-text">Plainclothes vehicles near Commonwealth Ave</div>
-          <div class="activity-time">32 min ago · photo attached</div>
+        <div style="background:var(--gl);border-radius:var(--r);padding:15px 17px;">
+          <div style="font-size:13px;font-weight:700;margin-bottom:6px;">Why it works</div>
+          <div style="font-size:13px;color:var(--gray);line-height:1.6;">Slow, controlled breathing activates the parasympathetic nervous system, reducing cortisol and slowing your heart rate within minutes.</div>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- SUPPORT TAB -->
-    <section id="support-tab" class="tab-content">
-
-      <!-- HOME MENU -->
-      <div class="support-home" id="support-home">
-        <div class="emergency-card">
-          <div class="emergency-label">Emergency Legal Line</div>
-          <div class="emergency-title">BU Legal Rapid Response</div>
-          <div class="emergency-number">(617) 353-XXXX</div>
-          <div class="emergency-sub">Available 24/7 · Confidential</div>
-          <a href="tel:+16173530000" class="call-btn">Call Now</a>
-        </div>
-
-        <div class="section-label">Mental Health</div>
-        <div class="menu-card" onclick="showSub('sub-breathe')">
-          <div class="menu-icon blue">🧘</div>
-          <div class="menu-text"><div class="menu-title">Breathing Exercise</div><div class="menu-sub">4-7-8 guided relaxation</div></div>
-          <span class="menu-arrow">›</span>
-        </div>
-        <div class="menu-card" onclick="showSub('sub-chat')">
-          <div class="menu-icon green">💬</div>
-          <div class="menu-text"><div class="menu-title">Anonymous Chat</div><div class="menu-sub">Talk to a peer supporter now</div></div>
-          <span class="menu-arrow">›</span>
-        </div>
-        <div class="menu-card" onclick="showSub('sub-psych')">
-          <div class="menu-icon purple">🧠</div>
-          <div class="menu-text"><div class="menu-title">Psychological Resources</div><div class="menu-sub">CAPS, crisis lines, therapist directory</div></div>
-          <span class="menu-arrow">›</span>
-        </div>
-
-        <div class="section-label">Training</div>
-        <div class="menu-card" onclick="showSub('sub-training')">
-          <div class="menu-icon blue">📋</div>
-          <div class="menu-text"><div class="menu-title">Know Your Rights Training</div><div class="menu-sub">Interactive scenarios · 5 min</div></div>
-          <span class="menu-arrow">›</span>
-        </div>
-
-        <div class="section-label">Community</div>
-        <div class="menu-card" onclick="showSub('sub-board')">
-          <div class="menu-icon orange">🗣️</div>
-          <div class="menu-text"><div class="menu-title">Community Board</div><div class="menu-sub">"What do I do if…" — ask anonymously</div></div>
-          <span class="menu-arrow">›</span>
-        </div>
-        <div class="menu-card" onclick="showSub('sub-unis')">
-          <div class="menu-icon red">🏛️</div>
-          <div class="menu-text"><div class="menu-title">Other Universities</div><div class="menu-sub">Resources from peer institutions</div></div>
-          <span class="menu-arrow">›</span>
-        </div>
-
-        <div class="section-label">Legal</div>
-        <div class="menu-card" onclick="showSub('sub-legal-res')">
-          <div class="menu-icon red">⚖️</div>
-          <div class="menu-text"><div class="menu-title">Legal Resources & Hotlines</div><div class="menu-sub">ISSO, ACLU, immigration hotlines</div></div>
-          <span class="menu-arrow">›</span>
-        </div>
-
-        <div class="heart-footer">Made with <span>♥</span> for the BU community.<br>You are not alone.</div>
-      </div>
-
-      <!-- SUB: BREATHE -->
-      <div class="support-sub" id="sub-breathe">
-        <div class="sub-header">
-          <button class="back-btn" onclick="showSupportHome()">‹</button>
-          <span class="sub-header-title">Breathing Exercise</span>
-        </div>
-        <div class="sub-content">
-          <p style="font-size:13px;color:var(--gray);line-height:1.6;">When you're feeling anxious, the 4-7-8 technique can calm your nervous system in under two minutes.</p>
-          <div class="breathe-card" onclick="openBreathe()">
-            <div class="breathe-ring-wrap">
-              <div class="breathe-ring"></div>
-              <span style="font-size:28px;">🫁</span>
-            </div>
-            <div class="breathe-label">Tap to Start</div>
-            <div class="breathe-hint">Inhale 4s · Hold 7s · Exhale 8s</div>
-          </div>
-          <div style="background:var(--gray-light);border-radius:var(--r);padding:15px 17px;">
-            <div style="font-size:13px;font-weight:700;margin-bottom:6px;">Why it works</div>
-            <div style="font-size:13px;color:var(--gray);line-height:1.6;">Slow, controlled breathing activates the parasympathetic nervous system, reducing cortisol and slowing your heart rate within minutes.</div>
+    <!-- SUB: CHAT -->
+    <div class="s-sub" id="s-chat">
+      <div class="sub-hdr"><button class="back" onclick="closeSub()">‹</button><span class="sub-title">Anonymous Chat</span></div>
+      <div class="sub-body">
+        <p style="font-size:13px;color:var(--gray);line-height:1.6;">Talk to a trained peer supporter. No name, no login. Everything is confidential.</p>
+        <div class="chat-wrap">
+          <div class="chat-msgs" id="chatMsgs"><div class="cb them">Hi — I'm here. You're safe. What's on your mind?</div></div>
+          <div class="chat-row">
+            <input class="chat-in" id="chatIn" placeholder="Type a message…" onkeydown="if(event.key==='Enter')sendChat()">
+            <button class="chat-send" onclick="sendChat()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- SUB: CHAT -->
-      <div class="support-sub" id="sub-chat">
-        <div class="sub-header">
-          <button class="back-btn" onclick="showSupportHome()">‹</button>
-          <span class="sub-header-title">Anonymous Chat</span>
-        </div>
-        <div class="sub-content">
-          <p style="font-size:13px;color:var(--gray);line-height:1.6;">Talk to a trained peer supporter. No name, no login. Everything is confidential.</p>
-          <div class="chat-card">
-            <div class="chat-messages" id="chatMessages">
-              <div class="chat-bubble them">Hi — I'm here. You're safe. What's on your mind?</div>
-            </div>
-            <div class="chat-input-row">
-              <input class="chat-input" id="chatInput" placeholder="Type a message…" onkeydown="if(event.key==='Enter')sendChat()">
-              <button class="chat-send" onclick="sendChat()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-              </button>
-            </div>
+    <!-- SUB: PSYCH -->
+    <div class="s-sub" id="s-psych">
+      <div class="sub-hdr"><button class="back" onclick="closeSub()">‹</button><span class="sub-title">Psychological Resources</span></div>
+      <div class="sub-body">
+        <div class="lc"><div class="ln">BU Counseling & Psychological Services</div><div class="ld">Free confidential counseling for BU students. In-person and telehealth available.</div><a href="https://www.bu.edu/shs/behavioral-medicine/" target="_blank" class="ll">Visit bu.edu/shs →</a></div>
+        <div class="lc"><div class="ln">Crisis Text Line</div><div class="ld">Text HOME to 741741. Free, 24/7, completely confidential.</div><a href="sms:741741" class="ll">Text 741741 →</a></div>
+        <div class="lc"><div class="ln">NAMI Helpline</div><div class="ld">National Alliance on Mental Illness. Support for immigration-related stress.</div><a href="tel:18009506264" class="ll">1-800-950-6264 →</a></div>
+        <div class="lc"><div class="ln">Therapy for Latinx</div><div class="ld">Culturally responsive therapist directory for Latinx and immigrant communities.</div><a href="https://www.therapyforlatinx.com" target="_blank" class="ll">therapyforlatinx.com →</a></div>
+        <div class="lc"><div class="ln">Open Path Collective</div><div class="ld">Affordable therapy ($30–$80/session) for students and low-income individuals.</div><a href="https://openpathcollective.org" target="_blank" class="ll">openpathcollective.org →</a></div>
+      </div>
+    </div>
+
+    <!-- SUB: TRAINING -->
+    <div class="s-sub" id="s-training">
+      <div class="sub-hdr"><button class="back" onclick="closeSub()">‹</button><span class="sub-title">Know Your Rights Training</span></div>
+      <div class="sub-body">
+        <div id="t-home">
+          <p style="font-size:13px;color:var(--gray);line-height:1.6;margin-bottom:12px;">Practice what to do in real situations. Each scenario takes about 1 minute.</p>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div class="tsc" onclick="startSc(0)"><div class="ts-badge">Scenario 1</div><div class="ts-title">ICE at your dorm door</div><div class="ts-desc">What do you do when agents knock and identify themselves?</div><div class="ts-go">Start →</div></div>
+            <div class="tsc" onclick="startSc(1)"><div class="ts-badge">Scenario 2</div><div class="ts-title">Stopped on the street</div><div class="ts-desc">An agent approaches you near campus and asks for your ID.</div><div class="ts-go">Start →</div></div>
+            <div class="tsc" onclick="startSc(2)"><div class="ts-badge">Scenario 3</div><div class="ts-title">Your friend is detained</div><div class="ts-desc">You witness a classmate being taken by plainclothes officers.</div><div class="ts-go">Start →</div></div>
+            <div class="tsc" onclick="startSc(3)"><div class="ts-badge">Scenario 4</div><div class="ts-title">Warrant verification</div><div class="ts-desc">An officer shows you a document. Is it a real judicial warrant?</div><div class="ts-go">Start →</div></div>
           </div>
+        </div>
+        <div id="t-sc" style="display:none;">
+          <div class="sprog"><div class="sbar"><div class="sfill" id="sfill"></div></div><div class="sstep" id="sstep">Step 1 of 3</div></div>
+          <div class="sbox" id="sbox"></div>
+          <div id="schoices" style="display:flex;flex-direction:column;gap:8px;"></div>
+          <div class="sfeedback" id="sfb"></div>
+          <button class="snext" id="snext" onclick="nextStep()">Continue →</button>
+          <button class="srestart" id="srestart" onclick="backToScHome()">← Try another scenario</button>
         </div>
       </div>
+    </div>
 
-      <!-- SUB: PSYCH -->
-      <div class="support-sub" id="sub-psych">
-        <div class="sub-header">
-          <button class="back-btn" onclick="showSupportHome()">‹</button>
-          <span class="sub-header-title">Psychological Resources</span>
+    <!-- SUB: BOARD -->
+    <div class="s-sub" id="s-board">
+      <div class="sub-hdr"><button class="back" onclick="closeSub()">‹</button><span class="sub-title">Community Board</span></div>
+      <div class="sub-body">
+        <p style="font-size:13px;color:var(--gray);line-height:1.6;">Ask anonymously. Share what you know. No names required.</p>
+        <div id="boardMsgs" style="display:flex;flex-direction:column;gap:8px;">
+          <div class="bm"><div class="bt">"What do I do if ICE comes to my dorm door?"</div><div class="bmet"><span class="bauth">— Anon Terrier</span><button class="rtog" onclick="togReply(this)">See reply</button></div><div class="rth"><div class="ri">Do NOT open the door. Ask them to slide the warrant under the door. Call the BU legal line immediately. — Peer Advisor</div></div></div>
+          <div class="bm"><div class="bt">"If my SEVIS record is terminated, what happens to my enrollment?"</div><div class="bmet"><span class="bauth">— Anon Terrier</span><button class="rtog" onclick="togReply(this)">See reply</button></div><div class="rth"><div class="ri">Contact ISSO immediately at bu.edu/isso — they have immigration lawyers on call. — ISSO Advisor</div></div></div>
+          <div class="bm"><div class="bt">"I witnessed ICE near GSU. Who should I tell?"</div><div class="bmet"><span class="bauth">— Anon Terrier</span><button class="rtog" onclick="togReply(this)">See reply</button></div><div class="rth"><div class="ri">Use the Map tab to post an anonymous report. You can also call BUPD at 617-353-2121. — BU Shield Team</div></div></div>
         </div>
-        <div class="sub-content">
-          <div class="list-card">
-            <div class="list-name">BU Counseling & Psychological Services</div>
-            <div class="list-desc">Free confidential counseling for BU students. In-person and telehealth available.</div>
-            <a href="https://www.bu.edu/shs/behavioral-medicine/" target="_blank" class="list-link">Visit bu.edu/shs →</a>
-          </div>
-          <div class="list-card">
-            <div class="list-name">Crisis Text Line</div>
-            <div class="list-desc">Text HOME to 741741. Free, 24/7, completely confidential.</div>
-            <a href="sms:741741" class="list-link">Text 741741 →</a>
-          </div>
-          <div class="list-card">
-            <div class="list-name">NAMI Helpline</div>
-            <div class="list-desc">National Alliance on Mental Illness. Specialized support for immigration-related stress.</div>
-            <a href="tel:18009506264" class="list-link">1-800-950-6264 →</a>
-          </div>
-          <div class="list-card">
-            <div class="list-name">Therapy for Latinx</div>
-            <div class="list-desc">Culturally responsive therapist directory for Latinx and immigrant communities.</div>
-            <a href="https://www.therapyforlatinx.com" target="_blank" class="list-link">therapyforlatinx.com →</a>
-          </div>
-          <div class="list-card">
-            <div class="list-name">Open Path Collective</div>
-            <div class="list-desc">Affordable therapy ($30–$80/session) for students and low-income individuals.</div>
-            <a href="https://openpathcollective.org" target="_blank" class="list-link">openpathcollective.org →</a>
-          </div>
+        <div class="post-area" style="margin-top:6px;">
+          <div class="palabel">Ask the community</div>
+          <textarea class="pi" id="postIn" rows="2" placeholder="What do I do if…"></textarea>
+          <button class="pb" onclick="postMsg()">Post Anonymously</button>
         </div>
       </div>
+    </div>
 
-      <!-- SUB: COMMUNITY BOARD -->
-      <div class="support-sub" id="sub-board">
-        <div class="sub-header">
-          <button class="back-btn" onclick="showSupportHome()">‹</button>
-          <span class="sub-header-title">Community Board</span>
-        </div>
-        <div class="sub-content">
-          <p style="font-size:13px;color:var(--gray);line-height:1.6;">Ask anonymously. Share what you know. No names, no accounts required.</p>
-          <div id="boardMessages" style="display:flex;flex-direction:column;gap:8px;">
-            <div class="board-msg">
-              <div class="board-text">"What do I do if ICE comes to my dorm door?"</div>
-              <div class="board-meta"><span class="board-author">— Anon Terrier</span><button class="reply-toggle" onclick="toggleReply(this)">See reply</button></div>
-              <div class="reply-thread"><div class="reply-item">Do NOT open the door. Ask them to slide the warrant under the door. Call the BU legal line immediately. You do not have to let anyone in without a judicial warrant signed by a federal judge. — Peer Advisor</div></div>
-            </div>
-            <div class="board-msg">
-              <div class="board-text">"If my SEVIS record is terminated, what happens to my enrollment?"</div>
-              <div class="board-meta"><span class="board-author">— Anon Terrier</span><button class="reply-toggle" onclick="toggleReply(this)">See reply</button></div>
-              <div class="reply-thread"><div class="reply-item">Contact ISSO immediately at bu.edu/isso — they have immigration lawyers on call. Federal courts have issued protections for some BU students. Do not leave campus without speaking to ISSO first. — ISSO Advisor</div></div>
-            </div>
-            <div class="board-msg">
-              <div class="board-text">"I witnessed ICE near GSU. Who should I tell?"</div>
-              <div class="board-meta"><span class="board-author">— Anon Terrier</span><button class="reply-toggle" onclick="toggleReply(this)">See reply</button></div>
-              <div class="reply-thread"><div class="reply-item">Use the Map tab to post an anonymous report. You can also call BUPD at 617-353-2121. The more reports we have, the faster the community stays safe. — BU Shield Team</div></div>
-            </div>
-          </div>
-          <div class="post-area" style="margin-top:6px;">
-            <div class="post-area-label">Ask the community</div>
-            <textarea class="post-input" id="postInput" rows="2" placeholder="What do I do if…"></textarea>
-            <button class="post-btn" onclick="postMessage()">Post Anonymously</button>
-          </div>
-        </div>
+    <!-- SUB: UNIS -->
+    <div class="s-sub" id="s-unis">
+      <div class="sub-hdr"><button class="back" onclick="closeSub()">‹</button><span class="sub-title">Other Universities</span></div>
+      <div class="sub-body">
+        <p style="font-size:13px;color:var(--gray);line-height:1.6;">Student protection resources from peer institutions.</p>
+        <a href="https://www.harvard.edu/immigration-resources" target="_blank" class="uc"><div><div class="un">Harvard University</div><div class="ud">Immigration resources & legal support</div></div><span class="ua">→</span></a>
+        <a href="https://isso.tufts.edu" target="_blank" class="uc"><div><div class="un">Tufts University</div><div class="ud">ISSO immigration guidance</div></div><span class="ua">→</span></a>
+        <a href="https://safety-security.uchicago.edu/stay-informed/uchicago-safe-mobile-safety-app" target="_blank" class="uc"><div><div class="un">University of Chicago</div><div class="ud">UChicago Safe — campus safety model</div></div><span class="ua">→</span></a>
+        <a href="https://iso.mit.edu" target="_blank" class="uc"><div><div class="un">MIT</div><div class="ud">International Students Office</div></div><span class="ua">→</span></a>
+        <a href="https://undocu.berkeley.edu" target="_blank" class="uc"><div><div class="un">UC Berkeley</div><div class="ud">Undocumented Student Program</div></div><span class="ua">→</span></a>
+        <a href="https://www.northeastern.edu/isso" target="_blank" class="uc"><div><div class="un">Northeastern University</div><div class="ud">ISSO student immigration support</div></div><span class="ua">→</span></a>
       </div>
+    </div>
 
-      <!-- SUB: TRAINING -->
-      <div class="support-sub" id="sub-training">
-        <div class="sub-header">
-          <button class="back-btn" onclick="showSupportHome()">‹</button>
-          <span class="sub-header-title">Know Your Rights Training</span>
-        </div>
-        <div class="sub-content">
-
-          <div id="training-home">
-            <p style="font-size:13px;color:var(--gray);line-height:1.6;">Practice what to do in real situations. Each scenario takes about 1 minute. No wrong answers — just learn.</p>
-            <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px;">
-              <div class="training-scenario-card" onclick="startScenario(0)">
-                <div class="ts-badge">Scenario 1</div>
-                <div class="ts-title">ICE at your dorm door</div>
-                <div class="ts-desc">What do you do when there's a knock and agents identify themselves?</div>
-                <div class="ts-start">Start →</div>
-              </div>
-              <div class="training-scenario-card" onclick="startScenario(1)">
-                <div class="ts-badge">Scenario 2</div>
-                <div class="ts-title">Stopped on the street</div>
-                <div class="ts-desc">An agent approaches you near campus and asks for your ID.</div>
-                <div class="ts-start">Start →</div>
-              </div>
-              <div class="training-scenario-card" onclick="startScenario(2)">
-                <div class="ts-badge">Scenario 3</div>
-                <div class="ts-title">Your friend is detained</div>
-                <div class="ts-desc">You witness a classmate being taken by plainclothes officers.</div>
-                <div class="ts-start">Start →</div>
-              </div>
-              <div class="training-scenario-card" onclick="startScenario(3)">
-                <div class="ts-badge">Scenario 4</div>
-                <div class="ts-title">Warrant verification</div>
-                <div class="ts-desc">An officer shows you a document. Is it a real judicial warrant?</div>
-                <div class="ts-start">Start →</div>
-              </div>
-            </div>
-          </div>
-
-          <div id="training-scenario" style="display:none;">
-            <div class="scenario-progress">
-              <div class="scenario-bar"><div class="scenario-fill" id="scenarioFill"></div></div>
-              <div class="scenario-step" id="scenarioStep">Step 1 of 3</div>
-            </div>
-            <div class="scenario-box" id="scenarioBox"></div>
-            <div id="scenarioChoices" style="display:flex;flex-direction:column;gap:8px;"></div>
-            <div id="scenarioFeedback" style="display:none;" class="scenario-feedback"></div>
-            <button id="scenarioNext" style="display:none;" class="post-btn" onclick="nextStep()">Continue →</button>
-            <button id="scenarioRestart" style="display:none;background:none;border:none;color:var(--red);font-family:\'DM Sans\',sans-serif;font-size:13px;font-weight:700;cursor:pointer;padding:8px 0;" onclick="backToTrainingHome()">← Try another scenario</button>
-          </div>
-
-        </div>
+    <!-- SUB: LEGAL -->
+    <div class="s-sub" id="s-legal">
+      <div class="sub-hdr"><button class="back" onclick="closeSub()">‹</button><span class="sub-title">Legal Resources</span></div>
+      <div class="sub-body">
+        <div class="lc"><div class="ln">BU ISSO Office</div><div class="ld">Immigration advisors and on-call lawyers for BU students.</div><a href="https://bu.edu/isso" target="_blank" class="ll">bu.edu/isso →</a></div>
+        <div class="lc"><div class="ln">ACLU Massachusetts</div><div class="ld">Free legal help for civil rights violations including unlawful detention.</div><a href="tel:6174823170" class="ll">(617) 482-3170 →</a></div>
+        <div class="lc"><div class="ln">National Immigration Legal Hotline</div><div class="ld">Free legal advice. Available in multiple languages.</div><a href="tel:18443631423" class="ll">1-844-363-1423 →</a></div>
+        <div class="lc"><div class="ln">Massachusetts AG Statement</div><div class="ld">ICE needs a judicial warrant to enter dorms. Official 2026 state guidance.</div><a href="https://www.mass.gov/news/governor-healey-attorney-general-campbell-ice-needs-a-judicial-warrant-to-enter-dorms" target="_blank" class="ll">Read statement →</a></div>
+        <div class="lc"><div class="ln">Know Your Rights — Mass.gov</div><div class="ld">Official MA Attorney General guidance on ICE encounters.</div><a href="https://www.mass.gov/news/ag-campbell-issues-guidance-for-immigrants-families-and-communities-on-ice-enforcement" target="_blank" class="ll">Read the guide →</a></div>
       </div>
+    </div>
 
-      <!-- SUB: OTHER UNIVERSITIES -->
-      <div class="support-sub" id="sub-unis">
-        <div class="sub-header">
-          <button class="back-btn" onclick="showSupportHome()">‹</button>
-          <span class="sub-header-title">Other Universities</span>
-        </div>
-        <div class="sub-content">
-          <p style="font-size:13px;color:var(--gray);line-height:1.6;">Student protection resources and databases from peer institutions across the US.</p>
-          <a href="https://www.harvard.edu/immigration-resources" target="_blank" class="uni-card"><div><div class="uni-name">Harvard University</div><div class="uni-desc">Immigration resources & legal support</div></div><span class="uni-arrow">→</span></a>
-          <a href="https://isso.tufts.edu" target="_blank" class="uni-card"><div><div class="uni-name">Tufts University</div><div class="uni-desc">ISSO immigration guidance</div></div><span class="uni-arrow">→</span></a>
-          <a href="https://safety.uchicago.edu/resources/uchicago-safe/" target="_blank" class="uni-card"><div><div class="uni-name">University of Chicago</div><div class="uni-desc">UChicago Safe — campus safety model</div></div><span class="uni-arrow">→</span></a>
-          <a href="https://iso.mit.edu" target="_blank" class="uni-card"><div><div class="uni-name">MIT</div><div class="uni-desc">International Students Office</div></div><span class="uni-arrow">→</span></a>
-          <a href="https://undocu.berkeley.edu" target="_blank" class="uni-card"><div><div class="uni-name">UC Berkeley</div><div class="uni-desc">Undocumented Student Program</div></div><span class="uni-arrow">→</span></a>
-          <a href="https://www.northeastern.edu/isso" target="_blank" class="uni-card"><div><div class="uni-name">Northeastern University</div><div class="uni-desc">ISSO student immigration support</div></div><span class="uni-arrow">→</span></a>
-        </div>
+  </div>
+
+  <!-- ══ PAGE 3: RIGHTS ══ -->
+  <div class="page" id="pg-rights">
+    <div class="legal-wrap">
+      <div class="lcard">
+        <div class="lcard-bg">🛡</div>
+        <div class="lcard-lbl">Your Rights Card</div>
+        <div class="lcard-h">SHOW THIS TO AN OFFICER</div>
+        <div class="lstmt">"I am exercising my constitutional rights. I do not consent to a search. This is a private residence. Please show me a judicial warrant signed by a federal judge."</div>
+        <div class="lcl">Emergency Contact</div>
+        <div class="lcn">BU Legal Rapid Response</div>
+        <div class="lcnum">(617) 353-XXXX</div>
+        <a href="tel:+16173530000" class="lcbtn">Call Now</a>
       </div>
-
-      <!-- SUB: LEGAL RESOURCES -->
-      <div class="support-sub" id="sub-legal-res">
-        <div class="sub-header">
-          <button class="back-btn" onclick="showSupportHome()">‹</button>
-          <span class="sub-header-title">Legal Resources</span>
+      <div class="wexp">
+        <div class="wtitle">Know the Difference</div>
+        <div class="wrow">
+          <div class="wt"><div class="wtn bad">✕ Admin Warrant</div><div class="wtd">Form I-200 or I-205. Signed by ICE only. Does NOT allow entry into dorms.</div></div>
+          <div class="wt"><div class="wtn ok">✓ Judicial Warrant</div><div class="wtd">Signed by a federal judge. Required to enter dorms and private areas.</div></div>
         </div>
-        <div class="sub-content">
-          <div class="list-card">
-            <div class="list-name">BU ISSO Office</div>
-            <div class="list-desc">Immigration advisors and on-call lawyers for BU students.</div>
-            <a href="https://bu.edu/isso" target="_blank" class="list-link">bu.edu/isso →</a>
-          </div>
-          <div class="list-card">
-            <div class="list-name">ACLU Massachusetts</div>
-            <div class="list-desc">Free legal help for civil rights violations including unlawful detention.</div>
-            <a href="tel:6174823170" class="list-link">(617) 482-3170 →</a>
-          </div>
-          <div class="list-card">
-            <div class="list-name">National Immigration Legal Hotline</div>
-            <div class="list-desc">Free legal advice for immigration emergencies. Available in multiple languages.</div>
-            <a href="tel:18443631423" class="list-link">1-844-363-1423 →</a>
-          </div>
-          <div class="list-card">
-            <div class="list-name">Massachusetts AG Statement</div>
-            <div class="list-desc">ICE needs a judicial warrant to enter dorms. Official 2026 state guidance.</div>
-            <a href="https://www.mass.gov/news/governor-healey-attorney-general-campbell-ice-needs-a-judicial-warrant-to-enter-dorms" target="_blank" class="list-link">Read the statement →</a>
-          </div>
-          <div class="list-card">
-            <div class="list-name">Know Your Rights — Mass.gov</div>
-            <div class="list-desc">Official MA Attorney General guidance on your rights during an ICE encounter.</div>
-            <a href="https://www.mass.gov/news/ag-campbell-issues-guidance-for-immigrants-families-and-communities-on-ice-enforcement" target="_blank" class="list-link">Read the guide →</a>
-          </div>
-        </div>
+        <div class="wnote">Massachusetts AG (2026): ICE needs a judicial warrant to enter dorms.</div>
       </div>
-
-    </section>
-
-    <!-- LEGAL TAB -->
-    <section id="legal-tab" class="tab-content">
-      <div class="legal-section">
-        <div class="legal-card">
-          <div class="legal-card-bg">🛡</div>
-          <div class="legal-card-label">Your Rights Card</div>
-          <div class="legal-card-title">SHOW THIS TO AN OFFICER</div>
-          <div class="legal-statement">"I am exercising my constitutional rights. I do not consent to a search. This is a private residence. Please show me a judicial warrant signed by a federal judge."</div>
-          <div class="legal-contact-label">Emergency Contact</div>
-          <div class="legal-contact-name">BU Legal Rapid Response</div>
-          <div class="legal-contact-number">(617) 353-XXXX</div>
-          <a href="tel:+16173530000" class="legal-call-btn">Call Now</a>
-        </div>
-        <div class="warrant-explainer">
-          <div class="warrant-title">Know the Difference</div>
-          <div class="warrant-row">
-            <div class="warrant-type"><div class="warrant-type-name bad">✕ Admin Warrant</div><div class="warrant-type-desc">Form I-200 or I-205. Signed by ICE only. Does NOT allow entry into dorms or private spaces.</div></div>
-            <div class="warrant-type"><div class="warrant-type-name good">✓ Judicial Warrant</div><div class="warrant-type-desc">Signed by a federal judge. Required to enter dorms, apartments, and private areas.</div></div>
-          </div>
-          <div class="warrant-note">Massachusetts AG (2026): ICE needs a judicial warrant to enter dorms.</div>
-        </div>
-        <div class="checklist">
-          <div style="font-size:13px;font-weight:700;color:var(--black);margin-bottom:2px;">What to do</div>
-          <div class="check-item"><div class="check-icon">✓</div><span>Do <strong>NOT</strong> open the door without a judicial warrant.</span></div>
-          <div class="check-item"><div class="check-icon">✓</div><span>Do <strong>NOT</strong> sign anything without a lawyer.</span></div>
-          <div class="check-item"><div class="check-icon">✓</div><span>Ask for the officer's name and badge number.</span></div>
-          <div class="check-item"><div class="check-icon">✓</div><span><strong>Record</strong> the interaction if safe to do so.</span></div>
-          <div class="check-item"><div class="check-icon">✓</div><span>You have the right to <strong>remain silent</strong>.</span></div>
-        </div>
+      <div class="cklist">
+        <div style="font-size:13px;font-weight:700;color:var(--black);margin-bottom:2px;">What to do</div>
+        <div class="cki"><div class="ckico">✓</div><span>Do <strong>NOT</strong> open the door without a judicial warrant.</span></div>
+        <div class="cki"><div class="ckico">✓</div><span>Do <strong>NOT</strong> sign anything without a lawyer.</span></div>
+        <div class="cki"><div class="ckico">✓</div><span>Ask for the officer's name and badge number.</span></div>
+        <div class="cki"><div class="ckico">✓</div><span><strong>Record</strong> the interaction if safe to do so.</span></div>
+        <div class="cki"><div class="ckico">✓</div><span>You have the right to <strong>remain silent</strong>.</span></div>
       </div>
-    </section>
+    </div>
+  </div>
 
-  </main>
-
-  <!-- BOTTOM NAV -->
+  <!-- NAV -->
   <nav>
-    <button class="nav-btn active" id="nav-map" onclick="showTab('map-tab', this)">
+    <button class="nb on" id="nb-map" onclick="goPage('pg-map','nb-map')">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
-      <span class="nav-label">Map</span>
+      <span>Map</span>
     </button>
-    <button class="nav-btn" id="nav-support" onclick="showTab('support-tab', this)">
+    <button class="nb" id="nb-support" onclick="goPage('pg-support','nb-support')">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-      <span class="nav-label">Support</span>
+      <span>Support</span>
     </button>
-    <button class="nav-btn" id="nav-legal" onclick="showTab('legal-tab', this)">
+    <button class="nb" id="nb-rights" onclick="goPage('pg-rights','nb-rights')">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      <span class="nav-label">Rights</span>
+      <span>Rights</span>
     </button>
   </nav>
 </div>
 
 <!-- REPORT MODAL -->
-<div class="modal-overlay" id="reportModal" onclick="closeModalOutside(event)">
+<div class="overlay" id="reportModal" onclick="closeModalOut(event)">
   <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-title">Report Anonymously</div>
-    <div class="anon-note">🔒 No personal data collected. Reports auto-delete in 4 hours.</div>
-    <div class="form-group">
-      <label class="form-label">Type of sighting</label>
-      <select class="form-select">
-        <option>Plainclothes agents / unmarked vehicles</option>
-        <option>Marked ICE vehicles</option>
-        <option>Uniformed agents on foot</option>
-        <option>Suspicious surveillance activity</option>
-        <option>Other</option>
-      </select>
+    <div class="mhandle"></div>
+    <div class="mtitle">Report Anonymously</div>
+    <div class="anote">🔒 No personal data collected. Reports auto-delete in 4 hours.</div>
+    <div class="fg"><label class="flbl">Type of sighting</label><select class="fsel"><option>Plainclothes agents / unmarked vehicles</option><option>Marked ICE vehicles</option><option>Uniformed agents on foot</option><option>Suspicious surveillance activity</option><option>Other</option></select></div>
+    <div class="fg"><label class="flbl">Description (optional)</label><textarea class="fta" placeholder="e.g. Two dark SUVs outside Warren Towers. Officers in plain clothes watching the entrance."></textarea></div>
+    <div class="fg">
+      <label class="flbl">Add Photo (optional)</label>
+      <div class="pup" onclick="document.getElementById('photoIn').click()"><div class="pico">📷</div><div class="ptxt">Tap to attach a photo</div></div>
+      <input type="file" id="photoIn" accept="image/*" style="display:none" onchange="previewPhoto(event)">
+      <div id="pp"><img id="pimg" src="" alt=""></div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Description (optional)</label>
-      <textarea class="form-textarea" placeholder="e.g. Two dark SUVs parked outside Warren Towers. Officers in plain clothes watching the entrance."></textarea>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Add Photo (optional)</label>
-      <div class="photo-upload" onclick="document.getElementById('photoInput').click()">
-        <div class="photo-upload-icon">📷</div>
-        <div class="photo-upload-text">Tap to attach a photo</div>
-      </div>
-      <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="previewPhoto(event)">
-      <div id="photoPreview"><img id="previewImg" src="" alt=""></div>
-    </div>
-    <button class="submit-btn" onclick="submitReport()">Submit Report</button>
-    <button class="cancel-btn" onclick="closeModal()">Cancel</button>
+    <button class="sbtn" onclick="submitReport()">Submit Report</button>
+    <button class="cbtn" onclick="closeModal()">Cancel</button>
   </div>
 </div>
 
-<!-- BREATHE MODAL -->
-<div class="breathe-modal" id="breatheModal">
-  <div class="breathe-circle">
-    <div class="breathe-ring-full"></div>
-    <span style="font-size:32px;">🫁</span>
-  </div>
-  <div class="breathe-text" id="breatheText">Breathe in...</div>
-  <div class="breathe-instruction">Follow the circle · Inhale 4s · Hold 7s · Exhale 8s</div>
-  <button class="breathe-close" onclick="closeBreathe()">Done</button>
+<!-- BREATHE FULLSCREEN -->
+<div class="bfull" id="bfull">
+  <div class="bcirc"><div class="bring"></div><span style="font-size:32px;">🫁</span></div>
+  <div class="btxt" id="btxt">Breathe in...</div>
+  <div class="bins">Follow the circle · Inhale 4s · Hold 7s · Exhale 8s</div>
+  <button class="bclose" onclick="closeBreathe()">Done</button>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-function showTab(tabId, btn) {
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById(tabId).classList.add('active');
-  btn.classList.add('active');
-  if (tabId === 'map-tab') setTimeout(() => map.invalidateSize(), 100);
-  if (tabId === 'support-tab') showSupportHome();
+// ── PAGE NAVIGATION ──
+function goPage(pageId, btnId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b => b.classList.remove('on'));
+  document.getElementById(pageId).classList.add('active');
+  document.getElementById(btnId).classList.add('on');
+  if (pageId === 'pg-map') setTimeout(() => map.invalidateSize(), 100);
 }
 
-function showSub(id) {
-  var home = document.getElementById('support-home');
-  home.style.setProperty('display', 'none', 'important');
-  document.querySelectorAll('.support-sub').forEach(function(s) {
-    s.classList.remove('active');
-    s.style.display = 'none';
-  });
-  var target = document.getElementById(id);
-  target.style.display = 'block';
-  target.classList.add('active');
+// ── SUPPORT SUB-PAGES ──
+function openSub(id) {
+  document.getElementById('s-home').style.display = 'none';
+  document.querySelectorAll('.s-sub').forEach(s => s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
 }
 
-function showSupportHome() {
-  var home = document.getElementById('support-home');
-  home.style.removeProperty('display');
-  home.style.display = 'flex';
-  document.querySelectorAll('.support-sub').forEach(function(s) {
-    s.classList.remove('active');
-    s.style.display = 'none';
-  });
-  var th = document.getElementById('training-home');
-  var ts = document.getElementById('training-scenario');
-  if (th) th.style.display = 'block';
-  if (ts) ts.style.display = 'none';
+function closeSub() {
+  document.getElementById('s-home').style.display = '';
+  document.querySelectorAll('.s-sub').forEach(s => s.classList.remove('on'));
 }
 
+// ── MAP ──
 var map = L.map('map', {zoomControl:false}).setView([42.3505, -71.1054], 14);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution:'© OpenStreetMap'}).addTo(map);
-var redIcon = L.divIcon({html:'<div style="background:#CC0000;width:13px;height:13px;border-radius:50%;border:2px solid white;box-shadow:0 0 8px rgba(204,0,0,.6)"></div>',className:'',iconAnchor:[6,6]});
-L.marker([42.3523,-71.1300],{icon:redIcon}).addTo(map).bindPopup('<b style="color:#CC0000">Verified</b><br>Allston Car Wash<br><small>10 min ago</small>');
+var ri = L.divIcon({html:'<div style="background:#CC0000;width:13px;height:13px;border-radius:50%;border:2px solid white;box-shadow:0 0 8px rgba(204,0,0,.6)"></div>',className:'',iconAnchor:[6,6]});
+L.marker([42.3523,-71.1300],{icon:ri}).addTo(map).bindPopup('<b style="color:#CC0000">Verified</b><br>Allston Car Wash<br><small>10 min ago</small>');
 L.circle([42.3523,-71.1300],{color:'#CC0000',fillColor:'#CC0000',fillOpacity:.1,radius:300,weight:1}).addTo(map);
-L.marker([42.3492,-71.0992],{icon:redIcon}).addTo(map).bindPopup('<b style="color:#CC0000">Unverified</b><br>Commonwealth Ave<br><small>32 min ago</small>');
+L.marker([42.3492,-71.0992],{icon:ri}).addTo(map).bindPopup('<b style="color:#CC0000">Unverified</b><br>Commonwealth Ave<br><small>32 min ago</small>');
 L.circle([42.3492,-71.0992],{color:'#f97316',fillColor:'#f97316',fillOpacity:.1,radius:200,weight:1}).addTo(map);
 
-function openModal() { document.getElementById('reportModal').classList.add('open'); }
-function closeModal() { document.getElementById('reportModal').classList.remove('open'); }
-function closeModalOutside(e) { if(e.target===document.getElementById('reportModal')) closeModal(); }
+// ── MODAL ──
+function openModal() { document.getElementById('reportModal').classList.add('on'); }
+function closeModal() { document.getElementById('reportModal').classList.remove('on'); }
+function closeModalOut(e) { if(e.target===document.getElementById('reportModal')) closeModal(); }
 function previewPhoto(e) {
-  const file = e.target.files[0]; if(!file) return;
-  const r = new FileReader();
-  r.onload = ev => { document.getElementById('previewImg').src=ev.target.result; document.getElementById('photoPreview').style.display='block'; };
+  var file = e.target.files[0]; if(!file) return;
+  var r = new FileReader();
+  r.onload = function(ev) { document.getElementById('pimg').src=ev.target.result; document.getElementById('pp').style.display='block'; };
   r.readAsDataURL(file);
 }
 function submitReport() { closeModal(); showToast('✅ Report submitted anonymously'); }
 
-var breatheTexts = ['Breathe in...','Hold...','Breathe out...'];
-var breatheIdx = 0, breatheTimer;
-var breatheDurations = [4000,7000,8000];
+// ── BREATHE ──
+var btexts = ['Breathe in...','Hold...','Breathe out...'];
+var bidx = 0, btimer;
+var bdurs = [4000,7000,8000];
 function openBreathe() {
-  document.getElementById('breatheModal').classList.add('open');
-  breatheIdx = 0;
-  document.getElementById('breatheText').textContent = breatheTexts[0];
-  function next() {
-    breatheIdx = (breatheIdx+1)%3;
-    document.getElementById('breatheText').textContent = breatheTexts[breatheIdx];
-    breatheTimer = setTimeout(next, breatheDurations[breatheIdx]);
-  }
-  breatheTimer = setTimeout(next, breatheDurations[0]);
+  document.getElementById('bfull').classList.add('on');
+  bidx = 0; document.getElementById('btxt').textContent = btexts[0];
+  function next() { bidx=(bidx+1)%3; document.getElementById('btxt').textContent=btexts[bidx]; btimer=setTimeout(next,bdurs[bidx]); }
+  btimer = setTimeout(next, bdurs[0]);
 }
-function closeBreathe() { document.getElementById('breatheModal').classList.remove('open'); clearTimeout(breatheTimer); }
+function closeBreathe() { document.getElementById('bfull').classList.remove('on'); clearTimeout(btimer); }
 
+// ── CHAT ──
 function sendChat() {
-  const input = document.getElementById('chatInput');
-  const text = input.value.trim(); if(!text) return;
-  const msgs = document.getElementById('chatMessages');
-  const me = document.createElement('div'); me.className='chat-bubble me'; me.textContent=text;
-  msgs.appendChild(me); input.value=''; msgs.scrollTop=msgs.scrollHeight;
-  setTimeout(() => {
-    const them = document.createElement('div'); them.className='chat-bubble them';
-    them.textContent="I hear you. Take a breath — you're safe right now. Can you tell me more?";
-    msgs.appendChild(them); msgs.scrollTop=msgs.scrollHeight;
-  }, 1000);
+  var inp = document.getElementById('chatIn'); var txt = inp.value.trim(); if(!txt) return;
+  var msgs = document.getElementById('chatMsgs');
+  var m = document.createElement('div'); m.className='cb me'; m.textContent=txt; msgs.appendChild(m);
+  inp.value=''; msgs.scrollTop=msgs.scrollHeight;
+  setTimeout(function() {
+    var r = document.createElement('div'); r.className='cb them';
+    r.textContent="I hear you. Take a breath — you're safe right now. Can you tell me more?";
+    msgs.appendChild(r); msgs.scrollTop=msgs.scrollHeight;
+  },1000);
 }
 
-function toggleReply(btn) {
-  const thread = btn.closest('.board-msg').querySelector('.reply-thread');
-  thread.classList.toggle('open');
-  btn.textContent = thread.classList.contains('open') ? 'Hide' : 'See reply';
+// ── BOARD ──
+function togReply(btn) {
+  var t = btn.closest('.bm').querySelector('.rth');
+  t.classList.toggle('on'); btn.textContent = t.classList.contains('on') ? 'Hide' : 'See reply';
+}
+function postMsg() {
+  var inp = document.getElementById('postIn'); var txt = inp.value.trim(); if(!txt) return;
+  var b = document.getElementById('boardMsgs');
+  var d = document.createElement('div'); d.className='bm';
+  d.innerHTML='<div class="bt">"'+txt+'"</div><div class="bmet"><span class="bauth">— Anon Terrier · just now</span><button class="rtog" onclick="togReply(this)">See reply</button></div><div class="rth"></div>';
+  b.appendChild(d); inp.value=''; showToast('✅ Posted anonymously');
 }
 
-function postMessage() {
-  const input = document.getElementById('postInput');
-  const text = input.value.trim(); if(!text) return;
-  const board = document.getElementById('boardMessages');
-  const msg = document.createElement('div'); msg.className='board-msg';
-  msg.innerHTML=`<div class="board-text">"${text}"</div><div class="board-meta"><span class="board-author">— Anon Terrier · just now</span><button class="reply-toggle" onclick="toggleReply(this)">See reply</button></div><div class="reply-thread"></div>`;
-  board.appendChild(msg); input.value=''; showToast('✅ Posted anonymously');
-}
-
-// TRAINING SCENARIOS
+// ── TRAINING ──
 var scenarios = [
-  {
-    title: "ICE at your dorm door",
-    steps: [
-      {
-        situation: "🚪 It's 9pm. Someone knocks on your dorm room door and says: \"Federal agents. Open up.\" What do you do first?",
-        choices: ["Open the door to see their badge", "Keep the door closed and ask them to identify themselves through the door", "Call 911 immediately", "Run out the back"],
-        correct: 1,
-        feedback: "✓ Correct. You are never required to open the door. Ask through the closed door: \"Who are you and why are you here?\" Keep the door closed until you can verify their identity and see a judicial warrant."
-      },
-      {
-        situation: "🪪 Through the door, the agent says they have a warrant. They slide a document under the door. It says \"Form I-200\" and is signed by an ICE supervisor. What does this mean?",
-        choices: ["This is a valid warrant — you must open the door", "This is an administrative warrant — it does NOT require you to open the door", "You should sign it to show cooperation", "Call your RA immediately and open the door"],
-        correct: 1,
-        feedback: "✓ Correct. Form I-200 is an administrative warrant signed by ICE — not a federal judge. It does NOT give agents the right to enter your private residence. Only a judicial warrant signed by a federal judge requires you to open the door."
-      },
-      {
-        situation: "📞 The agent is still at the door. What should you do next?",
-        choices: ["Open the door and cooperate — it will be easier", "Stay calm, say 'I do not consent to entry,' and immediately call BU's legal rapid response line", "Argue with the agent through the door", "Post on social media about what's happening"],
-        correct: 1,
-        feedback: "✓ Correct. Say clearly: 'I do not consent to entry without a judicial warrant.' Then call BU Legal Rapid Response immediately. Do not open the door, do not sign anything, and do not answer questions about your immigration status."
-      }
-    ]
-  },
-  {
-    title: "Stopped on the street",
-    steps: [
-      {
-        situation: "🚶 You are walking near Commonwealth Ave when a plainclothes agent approaches and says: \"Stop. Are you a US citizen?\" What do you do?",
-        choices: ["Answer the question honestly", "Run away", "Calmly say: 'Am I free to leave?' and remain silent about your status", "Show your student ID to prove you go to BU"],
-        correct: 2,
-        feedback: "✓ Correct. You have the right to remain silent about your immigration status. Ask: 'Am I free to leave?' If they say yes, walk away calmly. If they say no, you are being detained — remain silent and ask for a lawyer."
-      },
-      {
-        situation: "🛑 The agent says you are NOT free to leave. They ask to see your ID and documents. What do you do?",
-        choices: ["Show your passport or visa — it will help your case", "Say: 'I choose to remain silent. I want to speak to a lawyer.' Do not show documents.", "Explain your student visa status in detail", "Give them your BU ID to de-escalate"],
-        correct: 1,
-        feedback: "✓ Correct. You are not required to show immigration documents to ICE on the street. Say: 'I choose to remain silent and I want to speak to a lawyer.' Do not answer questions. Do not sign anything. Memorize or save the BU legal line: (617) 353-XXXX."
-      },
-      {
-        situation: "👁️ After the encounter, you are shaken but safe. What should you do now?",
-        choices: ["Forget about it and continue your day", "Document everything — time, location, what was said, officer descriptions — and report to ISSO", "Post the agent's photo on social media", "Do nothing unless they come back"],
-        correct: 1,
-        feedback: "✓ Correct. Document the encounter as soon as possible: time, location, what was said, number of officers, vehicle descriptions. Report to BU ISSO at bu.edu/isso. This documentation may be important if legal action is needed."
-      }
-    ]
-  },
-  {
-    title: "Your friend is detained",
-    steps: [
-      {
-        situation: "😨 You are near the GSU when you see two plainclothes agents grab your classmate and push them toward an unmarked car. Your classmate is shouting your name. What do you do first?",
-        choices: ["Chase the car", "Stay back, record from a safe distance, and note the time and location", "Try to physically intervene", "Do nothing — it is a federal matter"],
-        correct: 1,
-        feedback: "✓ Correct. Do not physically intervene — it can put you and your classmate at greater risk. Stay at a safe distance, record if it is safe to do so, and note: exact time, location, car description and plates, number of officers, and what was said."
-      },
-      {
-        situation: "📱 The car has left. Your classmate is gone. Who do you contact first?",
-        choices: ["Post on Instagram to raise awareness", "Contact BU ISSO immediately and share all the details you documented", "Wait to see if your classmate calls you", "Contact a news station"],
-        correct: 1,
-        feedback: "✓ Correct. Contact BU ISSO immediately at bu.edu/isso. Share everything you documented. ISSO can contact legal partners and begin locating your classmate through the ICE Detainee Locator System. Time is critical — act fast."
-      },
-      {
-        situation: "🔍 ISSO asks if you know your classmate's immigration status or visa type. You are not sure. What information IS helpful to provide?",
-        choices: ["Guess their status based on where they're from", "Their full name, student ID, physical description, and details of the encounter", "Nothing — you don't want to get involved legally", "Only the car's license plate"],
-        correct: 1,
-        feedback: "✓ Correct. You do not need to know your classmate's immigration status to help. Provide: full name, BU student ID if known, physical description, time and location of detention, car description, and anything agents said. All of this helps ISSO and legal teams locate and assist your classmate."
-      }
-    ]
-  },
-  {
-    title: "Warrant verification",
-    steps: [
-      {
-        situation: "📄 An agent slides a document under your door. It is titled 'Warrant for Arrest of Alien' and is signed by 'Deportation Officer J. Smith, ICE ERO.' Is this a judicial warrant?",
-        choices: ["Yes — it says 'warrant' so it must be valid", "No — this is an administrative warrant signed by an ICE officer, not a federal judge", "Yes — any signed government document is a judicial warrant", "I cannot tell without a lawyer"],
-        correct: 1,
-        feedback: "✓ Correct. A warrant titled 'Warrant for Arrest of Alien' (Form I-200) is an administrative warrant signed by ICE — not a court. It does NOT authorize entry into your home or dorm. Only a warrant signed by a federal judge (magistrate or district court judge) requires you to open the door."
-      },
-      {
-        situation: "⚖️ What does a real judicial warrant look like?",
-        choices: ["It is signed by a DHS official", "It is issued by a federal court, signed by a judge, and specifies the premises to be searched or the person to be arrested", "It has the ICE logo and a badge number", "It is always printed on official DHS letterhead"],
-        correct: 1,
-        feedback: "✓ Correct. A judicial warrant must be: (1) issued by a federal court, (2) signed by a federal judge or magistrate, and (3) specifically name the location to be searched or the person to be arrested. If it does not meet all three criteria, you are not required to open your door."
-      },
-      {
-        situation: "🤔 An agent shows you a document that looks official but you are not sure if it is a judicial warrant. What do you do?",
-        choices: ["Open the door to inspect it more closely", "Keep the door closed, ask them to slide it under, read it carefully, and call BU Legal Rapid Response before doing anything", "Assume it is valid and cooperate", "Take a photo of it through the peephole and post it online"],
-        correct: 1,
-        feedback: "✓ Correct. Keep the door closed. Ask them to slide the document under. Read it carefully: does it name a federal judge? Does it list your specific address? If you are unsure, call BU Legal Rapid Response at (617) 353-XXXX before taking any action. When in doubt — door stays closed."
-      }
-    ]
-  }
+  { steps:[
+    { q:"🚪 It's 9pm. Someone knocks on your dorm door and says: \"Federal agents. Open up.\" What do you do first?", c:["Open the door to see their badge","Keep the door closed and ask who they are through the door","Call 911 immediately","Run out the back"], ok:1, fb:"✓ Correct. You are never required to open the door. Ask through the closed door: \"Who are you and why are you here?\" Keep the door closed until you can verify their identity and see a judicial warrant." },
+    { q:"🪪 They slide a document under your door. It says \"Form I-200\" signed by an ICE supervisor. What does this mean?", c:["This is a valid warrant — you must open the door","This is an administrative warrant — it does NOT require you to open the door","You should sign it to show cooperation","Call your RA and open the door"], ok:1, fb:"✓ Correct. Form I-200 is an administrative warrant signed by ICE — not a federal judge. It does NOT give agents the right to enter your private residence." },
+    { q:"📞 The agent is still at the door. What should you do next?", c:["Open the door and cooperate","Stay calm, say 'I do not consent to entry,' and call BU Legal Rapid Response immediately","Argue with the agent through the door","Post on social media"], ok:1, fb:"✓ Correct. Say: 'I do not consent to entry without a judicial warrant.' Call BU Legal Rapid Response immediately. Do not open the door, do not sign anything." }
+  ]},
+  { steps:[
+    { q:"🚶 You are walking near Commonwealth Ave when a plainclothes agent says: \"Stop. Are you a US citizen?\" What do you do?", c:["Answer the question honestly","Run away","Calmly ask: 'Am I free to leave?' and remain silent about your status","Show your student ID"], ok:2, fb:"✓ Correct. You have the right to remain silent about your immigration status. Ask: 'Am I free to leave?' If yes, walk away calmly. If no, you are being detained — remain silent and ask for a lawyer." },
+    { q:"🛑 The agent says you are NOT free to leave and asks for documents. What do you do?", c:["Show your passport or visa","Say: 'I choose to remain silent. I want to speak to a lawyer.' Do not show documents.","Explain your student visa in detail","Give your BU ID to de-escalate"], ok:1, fb:"✓ Correct. You are not required to show immigration documents on the street. Say: 'I choose to remain silent and I want to speak to a lawyer.'" },
+    { q:"👁️ After the encounter, you are shaken but safe. What should you do now?", c:["Forget about it","Document everything — time, location, what was said — and report to ISSO","Post the agent's photo on social media","Do nothing unless they come back"], ok:1, fb:"✓ Correct. Document the encounter as soon as possible and report to BU ISSO at bu.edu/isso. This documentation may be important if legal action is needed." }
+  ]},
+  { steps:[
+    { q:"😨 You see two plainclothes agents grab your classmate and push them toward an unmarked car. What do you do first?", c:["Chase the car","Stay back, record from a safe distance, note the time and location","Try to physically intervene","Do nothing — it is a federal matter"], ok:1, fb:"✓ Correct. Do not physically intervene. Stay at a safe distance, record if safe, and note: exact time, location, car description, number of officers, and what was said." },
+    { q:"📱 The car has left. Your classmate is gone. Who do you contact first?", c:["Post on Instagram","Contact BU ISSO immediately and share all the details you documented","Wait to see if your classmate calls you","Contact a news station"], ok:1, fb:"✓ Correct. Contact BU ISSO immediately at bu.edu/isso. ISSO can contact legal partners and begin locating your classmate. Time is critical." },
+    { q:"🔍 What information is most helpful to provide to ISSO?", c:["Guess their immigration status","Their full name, student ID, physical description, and details of the encounter","Nothing — you don't want to get involved","Only the car's license plate"], ok:1, fb:"✓ Correct. Provide: full name, BU student ID if known, physical description, time and location of detention, car description, and anything agents said." }
+  ]},
+  { steps:[
+    { q:"📄 An agent slides a document titled 'Warrant for Arrest of Alien' signed by 'ICE Deportation Officer J. Smith.' Is this a judicial warrant?", c:["Yes — it says 'warrant' so it is valid","No — this is an administrative warrant signed by ICE, not a federal judge","Yes — any signed government document is judicial","I cannot tell without a lawyer"], ok:1, fb:"✓ Correct. 'Warrant for Arrest of Alien' (Form I-200) is an administrative warrant signed by ICE — not a court. It does NOT authorize entry into your home or dorm." },
+    { q:"⚖️ What does a real judicial warrant look like?", c:["It is signed by a DHS official","It is issued by a federal court, signed by a judge, and names the premises or person","It has the ICE logo and a badge number","It is always on DHS letterhead"], ok:1, fb:"✓ Correct. A judicial warrant must be: (1) issued by a federal court, (2) signed by a federal judge or magistrate, and (3) specifically name the location or person." },
+    { q:"🤔 You are not sure if a document is a judicial warrant. What do you do?", c:["Open the door to inspect it","Keep the door closed, have them slide it under, read carefully, and call BU Legal before acting","Assume it is valid and cooperate","Take a photo through the peephole"], ok:1, fb:"✓ Correct. Keep the door closed. Ask them to slide it under. Call BU Legal Rapid Response at (617) 353-XXXX before taking any action. When in doubt — door stays closed." }
+  ]}
 ];
 
-var currentScenario = 0;
-var currentStep = 0;
-var answered = false;
+var curSc = 0, curStep = 0, answered = false;
 
-function startScenario(idx) {
-  currentScenario = idx;
-  currentStep = 0;
-  answered = false;
-  document.getElementById('training-home').style.display = 'none';
-  document.getElementById('training-scenario').style.display = 'block';
+function startSc(i) {
+  curSc = i; curStep = 0; answered = false;
+  document.getElementById('t-home').style.display = 'none';
+  document.getElementById('t-sc').style.display = 'block';
   renderStep();
 }
 
 function renderStep() {
   answered = false;
-  var sc = scenarios[currentScenario];
-  var step = sc.steps[currentStep];
-  var total = sc.steps.length;
-  var pct = (currentStep / total) * 100;
-
-  document.getElementById('scenarioFill').style.width = pct + '%';
-  document.getElementById('scenarioStep').textContent = 'Step ' + (currentStep+1) + ' of ' + total;
-  document.getElementById('scenarioBox').textContent = step.situation;
-
-  var choices = document.getElementById('scenarioChoices');
-  choices.innerHTML = '';
-  choices.style.display = 'flex';
-  step.choices.forEach(function(c, i) {
-    var btn = document.createElement('button');
-    btn.className = 'scenario-choice';
-    btn.textContent = c;
-    btn.onclick = function() { selectChoice(i); };
-    choices.appendChild(btn);
+  var sc = scenarios[curSc]; var step = sc.steps[curStep]; var total = sc.steps.length;
+  document.getElementById('sfill').style.width = ((curStep/total)*100)+'%';
+  document.getElementById('sstep').textContent = 'Step '+(curStep+1)+' of '+total;
+  document.getElementById('sbox').textContent = step.q;
+  var cc = document.getElementById('schoices'); cc.innerHTML='';
+  step.c.forEach(function(c,i){
+    var b=document.createElement('button'); b.className='schoice'; b.textContent=c;
+    b.onclick=function(){pick(i);}; cc.appendChild(b);
   });
-
-  document.getElementById('scenarioFeedback').style.display = 'none';
-  document.getElementById('scenarioNext').style.display = 'none';
-  document.getElementById('scenarioRestart').style.display = 'none';
+  document.getElementById('sfb').style.display='none';
+  document.getElementById('snext').style.display='none';
+  document.getElementById('srestart').style.display='none';
 }
 
-function selectChoice(idx) {
-  if (answered) return;
-  answered = true;
-  var step = scenarios[currentScenario].steps[currentStep];
-  var btns = document.querySelectorAll('.scenario-choice');
-  btns.forEach(function(b, i) {
-    b.style.pointerEvents = 'none';
-    if (i === step.correct) b.classList.add('correct');
-    else if (i === idx && idx !== step.correct) b.classList.add('wrong');
+function pick(i) {
+  if(answered) return; answered=true;
+  var step = scenarios[curSc].steps[curStep];
+  document.querySelectorAll('.schoice').forEach(function(b,j){
+    b.style.pointerEvents='none';
+    if(j===step.ok) b.classList.add('ok');
+    else if(j===i && i!==step.ok) b.classList.add('no');
   });
-  var fb = document.getElementById('scenarioFeedback');
-  fb.textContent = step.feedback;
-  fb.className = 'scenario-feedback' + (idx === step.correct ? ' good' : '');
-  fb.style.display = 'block';
-
-  var isLast = currentStep >= scenarios[currentScenario].steps.length - 1;
-  if (isLast) {
-    document.getElementById('scenarioNext').style.display = 'none';
-    document.getElementById('scenarioRestart').style.display = 'block';
-    document.getElementById('scenarioFill').style.width = '100%';
-    document.getElementById('scenarioStep').textContent = 'Complete ✓';
-  } else {
-    document.getElementById('scenarioNext').style.display = 'block';
-  }
+  var fb=document.getElementById('sfb');
+  fb.textContent=step.fb; fb.className='sfeedback'+(i===step.ok?' ok':'');
+  fb.style.display='block';
+  var last = curStep >= scenarios[curSc].steps.length-1;
+  if(last){ document.getElementById('sfill').style.width='100%'; document.getElementById('sstep').textContent='Complete ✓'; document.getElementById('srestart').style.display='block'; }
+  else { document.getElementById('snext').style.display='block'; }
 }
 
-function nextStep() {
-  currentStep++;
-  renderStep();
+function nextStep(){ curStep++; renderStep(); }
+
+function backToScHome(){
+  document.getElementById('t-home').style.display='block';
+  document.getElementById('t-sc').style.display='none';
 }
 
-function backToTrainingHome() {
-  document.getElementById('training-home').style.display = 'block';
-  document.getElementById('training-scenario').style.display = 'none';
-}
-
-
-  const t = document.getElementById('toast'); t.textContent=msg; t.style.display='block';
-  setTimeout(()=>t.style.display='none', 2600);
+// ── TOAST ──
+function showToast(msg){
+  var t=document.getElementById('toast'); t.textContent=msg; t.style.display='block';
+  setTimeout(function(){t.style.display='none';},2600);
 }
 </script>
 </body>
